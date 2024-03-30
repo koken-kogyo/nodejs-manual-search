@@ -1,0 +1,329 @@
+<!-- index.ejs -->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>手順書表示</title>
+    <!-- レスポンシブwebデザインの指定 --><!-- デバイスの横幅合わせ,等倍表示（半角空白入れるな！） -->
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style-basic.css">
+    <link rel="stylesheet" href="/static/css/style-index.css">
+</head>
+<body>
+    <!-- Header -->
+    <%- include("_header.ejs", { title: "手順書検索", req }) %>
+
+    <div id="containers">
+        <!-- Groups -->
+        <div id="navigate">
+            <!-- 入力ボックス -->
+            <div class="navi-item">
+                <div class="large">社員番号:</div>
+                <div class="normal">Employee number (Barcode)</div>
+                <input type="text" maxlength="7" placeholder="担当者コード" id="input-empno">
+            </div>
+            <div class="navi-item">
+                <div class="large">作業者名:</div>
+                <div class="normal">Worker</div>
+                <label id="worker">Worker</label>
+            </div>
+            <div class="navi-item">
+                <div class="large">製品バーコード：</div>
+                <div class="normal">Product code (Barcode)</div>
+                <input type="text" maxlength="15" placeholder="品番をスキャン" oninput="inputChange()" id="input-hmcd">
+            </div>
+            <div></div>
+            <div class="navi-button">
+                <div class="button-title">Worker Change</div>
+                <a href="javascript:workerchange()">
+                    <button class="button">作業者変更</button>
+                </a>
+            </div>
+            <div class="navi-button">
+                <div class="button-title">View History</div>
+                <a href="javascript:viewHistory()">
+                    <button class="button">履歴を表示</button>
+                </a>
+            </div>
+            <div class="navi-button">
+                <div class="button-title">Finish</div>
+                <a href="javascript:end()">
+                    <button class="button">作業終了</button>
+                </a>
+           </div>
+            <input type="hidden" name="odcd" id="odcd" value="<%= req.params.odcd %>">
+            <input type="hidden" name="searchHmcd" id="search-hmcd" value="">
+            <input type="hidden" name="searchPage" id="search-page" value="">
+        </div>
+
+        <!-- Details -->
+        <div id="details">
+            <div id="output">
+                <iframe src="/static/pdfs/Initialize.pdf#view=FitV&toolbar=0&zoom=FitV" width="100%" height="100%" frameborder="0" style="border:none;">
+                    <p>
+                        Your Browser does not support PFD files.
+                    </p>
+                </iframe>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <%- include("_footer.ejs", req) %>
+
+    <!-- ブラウザ読み込み完了後のJavaScriptを記述 -->
+    <script>
+        // キーダウンイベントリスナーを設定
+        const inputEmpno = document.getElementById("input-empno");
+        const inputHmcd = document.getElementById("input-hmcd");
+        inputEmpno.addEventListener("keydown", empnoKeydown);
+        inputHmcd.addEventListener("keydown", hmcdKeydown);
+
+        // 初期フォーカスを設定
+        inputEmpno.select(); 
+        
+        // 担当者コードコールバック関数
+        function empnoKeydown(e) {
+            if (e.key === "Enter" && this.value !== "") {
+                const empno = ("00000" + this.value).slice(-5);
+
+                // (1) XMLHttpRequestオブジェクトを作成
+                const xmlHttpRequest = new XMLHttpRequest();
+                // (2) CSVデータ作成依頼
+                xmlHttpRequest.open('GET', `/search/km0010/${empno}`, false); // 第3引数false:同期通信
+                xmlHttpRequest.send();
+                // (3) 同期処理終了後、ステータス判定
+                if (xmlHttpRequest.readyState == 4 && xmlHttpRequest.status == 200 ) {
+                    const name = JSON.parse(xmlHttpRequest.responseText);
+                    // >8 >16
+                    if (name.length > 16) {
+                        document.querySelector("#worker").style.fontSize = "0.9em";
+                    } else if (name.length > 8) {
+                        document.querySelector("#worker").style.fontSize = "1.1em";
+                    } else {
+                        document.querySelector("#worker").style.fontSize = "1.5em";
+                    }
+                    document.getElementById("worker").innerText = name;
+                    document.getElementById("input-hmcd").select();
+                } else {
+                    document.getElementById("worker").innerText = "担当者が見つかりません";
+                    document.querySelector("#worker").style.fontSize = "1.1em";
+                }
+            }
+        }
+
+        // キーボード入力小文字から大文字変換
+        function inputChange(){
+            const inputHMCD = document.getElementById("input-hmcd"); 
+            const HMCD = inputHMCD.value.toUpperCase();
+            // alert(HMCD);
+            inputHMCD.value = inputHMCD.value.toUpperCase();
+        }
+
+        // 手順書の表示（品番入力のコールバック関数）
+        function hmcdKeydown(e) {
+            if (e.key === "Enter" && this.value !== "") {
+                const title = document.getElementById("menutitle");
+                const output = document.getElementById("output");
+                const odcd = document.getElementById("odcd").value;
+                const empno = ("00000" + document.getElementById("input-empno").value).slice(-5);
+                const inputHmcd = document.getElementById("input-hmcd").value;
+                // (1) XMLHttpRequestオブジェクトを作成
+                const xmlHttpRequest = new XMLHttpRequest();
+                // (2) CSVデータ作成依頼
+                xmlHttpRequest.open('GET', `/search/filename/${inputHmcd}`, false);
+                xmlHttpRequest.send();
+                // (3) 同期処理終了後、ステータス判定
+                if (xmlHttpRequest.readyState == 4 && xmlHttpRequest.status == 200 ) {
+                    const aryfn = JSON.parse(xmlHttpRequest.responseText);
+
+                    // (4) ページ切替ボタンを表示
+                    let next = "";
+                    if (aryfn.length > 1) {
+                        next = "<a href='javascript:next()'><i class='fas fa-chevron-circle-right next'></i></a>";
+                    }
+
+                    // (5) タイトル文字列更新
+                    title.innerText = "手順書 [" + aryfn[0] + "] " + aryfn.length + "件Hit";
+                    document.querySelector("#menutitle").style.left = "calc((100vw / 2) - " + aryfn[0].length / 3 + "em)"
+
+                    // (6) 手順書PDFを表示
+                    const pdfPath = "/static/pdfs/";
+                    const pdfName = aryfn[0];
+                    const pdfPara = "#view=FitV&toolbar=0&zoom=FitV";
+                    output.innerHTML = `<iframe src='${pdfPath}${pdfName}${pdfPara}' width='100%' height='100%' frameborder='0' style='border:none;'></iframe>${next}`;
+
+                    // (7) 作業履歴ファイルDB更新
+                    const hmcd = aryfn[0].split("_")[2].toUpperCase().replace(".PDF", "");
+                    xmlHttpRequest.open('GET', `/insert/${odcd}/${empno}/${hmcd}`, false);
+                    xmlHttpRequest.send();
+
+                    // (8) 同期処理終了後、ステータス判定
+                    if (xmlHttpRequest.readyState == 4 && xmlHttpRequest.status == 299 ) {
+                        alert("目視検査履歴ファイルの登録に失敗しました\n\nシステム担当者に連絡した上で\n作業は継続してください．");
+                    }
+
+                } else {
+                    title.innerText = "手順書検索";
+                    document.querySelector("#menutitle").style.left = "calc((100vw / 2) - 3em)"
+                    //pdfの表示
+                    const pdfPath = "/static/pdfs/";
+                    const pdfName = "Nothing.pdf";
+                    output.innerHTML = `<iframe src='${pdfPath}${pdfName}#view=FitV&toolbar=0&zoom=FitV' width='100%' height='100%' frameborder='0' style='border:none;'></iframe>`;
+                }
+
+                // 検索状態を保持
+                document.getElementById("search-hmcd").value = inputHmcd;
+                document.getElementById("search-page").value = "0";
+
+                this.select();
+            }
+        }
+
+        // 次ページ
+        function next() {
+            const hmcd = document.getElementById("search-hmcd").value;
+            const page = Number(document.getElementById("search-page").value) + 1;
+            const title = document.getElementById("menutitle");
+            const output = document.getElementById("output");
+                
+            // (1) XMLHttpRequestオブジェクトを作成
+            const xmlHttpRequest = new XMLHttpRequest();
+            // (2) CSVデータ作成依頼
+            xmlHttpRequest.open('GET', `/search/filename/${hmcd}`, false); // 第3引数false:同期通信
+            xmlHttpRequest.send();
+            // (3) 同期処理終了後、ステータス判定
+            if (xmlHttpRequest.readyState == 4 && xmlHttpRequest.status == 200 ) {
+                const fns = JSON.parse(xmlHttpRequest.responseText);
+                title.innerText = "手順書 [" + fns[page] + "] " + (page + 1) + "/" + fns.length + "件";
+                document.querySelector("#menutitle").style.left = "calc((100vw / 2) - " + fns[0].length / 3 + "em)"
+
+                // ボタン
+                let prev = "<a href='javascript:prev()'><i class='fas fa-chevron-circle-left prev'></i></a>";
+                let next = "";
+                if (fns.length - 1 === page) {
+                    next = "";
+                } else {
+                    next = "<a href='javascript:next()'><i class='fas fa-chevron-circle-right next'></i></a>";
+                }
+
+                // (4) CSVダウンロード済みにDOM更新 (1.img画像と2.リンク先)
+                const pdfPath = "/static/pdfs/";
+                const pdfName = fns[page];
+                const pdfPara = "#view=FitV&toolbar=0&zoom=FitV";
+                output.innerHTML = `${prev}<iframe src='${pdfPath}${pdfName}${pdfPara}' width='100%' height='100%' frameborder='0' style='border:none;'></iframe>${next}`;
+            } else {
+                title.innerText = "手順書検索";
+                document.querySelector("#menutitle").style.left = "calc((100vw / 2) - 3em)"
+                //pdfの表示
+                const pdfPath = "/static/pdfs/";
+                const pdfName = "Nothing.pdf";
+                output.innerHTML = `<iframe src='${pdfPath}${pdfName}#view=FitV&toolbar=0&zoom=FitV' width='100%' height='100%' frameborder='0' style='border:none;'></iframe>`;
+            }
+            // タイトル文字列更新
+
+            document.getElementById("search-hmcd").value = hmcd;
+            document.getElementById("search-page").value = page;
+
+            document.getElementById("input-hmcd").select();
+        }
+
+        // 前ページ
+        function prev() {
+            const hmcd = document.getElementById("search-hmcd").value;
+            const page = Number(document.getElementById("search-page").value) - 1;
+            const title = document.getElementById("menutitle");
+            const output = document.getElementById("output");
+                
+            // (1) XMLHttpRequestオブジェクトを作成
+            const xmlHttpRequest = new XMLHttpRequest();
+            // (2) CSVデータ作成依頼
+            xmlHttpRequest.open('GET', `/search/filename/${hmcd}`, false); // 第3引数false:同期通信
+            xmlHttpRequest.send();
+            // (3) 同期処理終了後、ステータス判定
+            if (xmlHttpRequest.readyState == 4 && xmlHttpRequest.status == 200 ) {
+                const fns = JSON.parse(xmlHttpRequest.responseText);
+                title.innerText = "手順書 [" + fns[page] + "] " + (page + 1) + "/" + fns.length + "件";
+                document.querySelector("#menutitle").style.left = "calc((100vw / 2) - " + fns[0].length / 3 + "em)"
+
+                // ボタン
+                let prev = "";
+                if (page === 0) {
+                    prev = "";
+                } else {
+                    prev = "<a href='javascript:prev()'><i class='fas fa-chevron-circle-left prev'></i></a>";
+                }
+                let next = "<a href='javascript:next()'><i class='fas fa-chevron-circle-right next'></i></a>";
+
+                // (4) CSVダウンロード済みにDOM更新 (1.img画像と2.リンク先)
+                const pdfPath = "/static/pdfs/";
+                const pdfName = fns[page];
+                const pdfPara = "#view=FitV&toolbar=0&zoom=FitV";
+                output.innerHTML = `${prev}<iframe src='${pdfPath}${pdfName}${pdfPara}' width='100%' height='100%' frameborder='0' style='border:none;'></iframe>${next}`;
+            } else {
+                title.innerText = "手順書検索";
+                document.querySelector("#menutitle").style.left = "calc((100vw / 2) - 3em)"
+                //pdfの表示
+                const pdfPath = "/static/pdfs/";
+                const pdfName = "Nothing.pdf";
+                output.innerHTML = `<iframe src='${pdfPath}${pdfName}#view=FitV&toolbar=0&zoom=FitV' width='100%' height='100%' frameborder='0' style='border:none;'></iframe>`;
+            }
+            // タイトル文字列更新
+
+            document.getElementById("search-hmcd").value = hmcd;
+            document.getElementById("search-page").value = page;
+
+            document.getElementById("input-hmcd").select();
+        }
+
+        // 作業終了
+        function end() {
+            const odcd = document.getElementById("odcd").value;
+            const empno = ("00000" + document.getElementById("input-empno").value).slice(-5);
+            const hmcd = document.getElementById("search-hmcd").value;
+            if (hmcd == "" || hmcd == null) {home();}
+            if (hmcd != document.getElementById("input-hmcd").value) {
+                if (!window.confirm("検索品番と入力品番が違います！\n手順書の品番で続行してもよろしいですか？")) { return; }
+            }
+            // (1) XMLHttpRequestオブジェクトを作成
+            const xmlHttpRequest = new XMLHttpRequest();
+            // (2) 作業履歴ファイルDB更新
+            xmlHttpRequest.open('GET', `/update/${odcd}/${empno}/${hmcd}`, false);
+            xmlHttpRequest.send();
+            // (3) 同期処理終了後、ステータス判定
+            if (xmlHttpRequest.readyState == 4 && xmlHttpRequest.status == 299 ) {
+                alert("目視検査履歴ファイルの更新に失敗しました\n\nシステム担当者に連絡した上で\n作業は継続してください．");
+            }
+
+            document.getElementById("menutitle").innerText = "手順書検索";
+            document.querySelector("#menutitle").style.left = "calc((100vw / 2) - 3em)"
+            document.getElementById("input-hmcd").value = "";
+            document.getElementById("search-hmcd").value = "";
+            document.getElementById("search-page").value = "";
+            const output = document.getElementById("output");
+            const pdfPath = "/static/pdfs/";
+            const pdfName = "Initialize.pdf";
+            output.innerHTML = `<iframe src='${pdfPath}${pdfName}#view=FitV&toolbar=0&zoom=FitV' width='100%' height='100%' frameborder='0' style='border:none;'></iframe>`;
+            document.getElementById("input-hmcd").select();
+        }
+
+        // 作業者変更
+        function workerchange() {
+            document.getElementById("menutitle").innerText = "手順書検索";
+            document.querySelector("#menutitle").style.left = "calc((100vw / 2) - 3em)"
+            document.getElementById("input-empno").value = "";
+            document.getElementById("worker").innerText = "Worker";
+            document.getElementById("input-hmcd").value = "";
+            document.getElementById("search-hmcd").value = "";
+            document.getElementById("search-page").value = "";
+            const output = document.getElementById("output");
+            const pdfPath = "/static/pdfs/";
+            const pdfName = "Initialize.pdf";
+            output.innerHTML = `<iframe src='${pdfPath}${pdfName}#view=FitV&toolbar=0&zoom=FitV' width='100%' height='100%' frameborder='0' style='border:none;'></iframe>`;
+            document.getElementById("input-empno").select();
+        }
+    </script>
+
+</body>
+</html>

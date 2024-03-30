@@ -1,0 +1,147 @@
+@charset "UTF-8";
+/* =========================================================================== */
+/*  es-style.css : 主にMPページ群で使用する基本的なスタイルシート
+/* =========================================================================== */
+#containers {
+    padding-top: 40px;
+    height: calc(100vh - 20px);
+    width: 100vw;
+    display: grid;
+    background: rgb(250, 250, 250);
+    grid-template-columns: 14em auto;
+    grid-template-rows: 1fr;
+}
+/* 画面の比率が A3比率 [√2:1] 以下の 縦長画面の場合は上下にナビゲーションを配置 */
+@media screen and (max-aspect-ratio: 1414/1000) {
+    #containers {
+        grid-template-columns: 1fr;
+        grid-template-rows: 50px auto;
+        background: rgb(25, 25, 25);
+    }
+}
+/* =========================================================================== */
+/*  Navigation共通グループ
+/* =========================================================================== */
+/* 画面の比率が A3比率 [√2:1] 以上の 横長画面の場合は左右にナビゲーションを配置 */
+#navigate {
+    display: grid;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    grid-template-columns: 1fr;
+    grid-template-rows: 7rem 8rem 7rem 1fr 4.7rem 4.7rem 4.7rem;
+    background: #f8f8f8;
+    font-size: 1.0em; /* ベースフォントサイズ */
+}
+/* 画面の比率が A3比率 [√2:1] 以下の 縦長画面の場合は上下にナビゲーションを配置 */
+@media screen and (max-aspect-ratio: 1414/1000) {
+    #navigate {
+        grid-template-columns: repeat(3, 1fr);
+        grid-template-rows: 1fr; /* subgrid; */ 
+        background: rgb(25, 25, 25);
+    }
+}
+.large {
+    font-size: 1.5em;
+    margin-left: 0.3em;
+}
+.normal {
+    font-size: 0.8em;
+    color: #999;
+    margin-left: 1em;
+    margin-bottom: 0.5em;
+}
+#worker {
+    display: flex;
+    font-size: 1.5em;
+    width: 86%;
+    margin: 0 0.3em;
+    padding: 0.3em;
+    color: #fff;
+    background: #2589d0;
+}
+input[type='text'] {
+    font-size: 1em;
+    width: 85%;
+    margin-left: 0.5em;
+    padding: 0.3em;
+    border: 1px solid rgba(82, 223, 0, 0.936);
+    outline: none;
+}
+input[type='text']:focus {
+    box-shadow: 0 0 2px 2px rgba(233, 85, 85, 0.8);
+}
+.button-title {
+    font-size: 0.8em;
+    color: #999;
+    text-align: center;
+    margin-bottom: 2px;
+}
+.button {
+    width: 88%;
+    margin:0 0.5em;
+    padding: 0.2em 1.5em;
+    border: 1.5px solid #2589d0;
+    border-radius: 5px;
+    background-color: #fff;
+    color: #2589d0;
+    font-size: 1.5em;
+}
+.button:hover {
+    background-color: #2589d0;
+    color: #fff;
+    cursor: pointer;
+}
+/* =========================================================================== */
+/*  手順書
+/* =========================================================================== */
+#details {
+    width: 100%;
+    height: 100%;
+    margin: auto;
+}
+#output {
+    width: 100%;
+    height: 100%;
+}
+#details ul {
+    display: inline-block;
+    text-align: center;
+}
+.prev {
+    position: fixed;
+    left: 80px;
+    top: calc((100vh / 2) - 30px);
+    font-size: 5em;
+    color: rgb(25, 25, 25, 0.05);
+}
+.prev:hover {
+    color: rgb(25, 25, 25, 0.4);
+}
+.next {
+    position: fixed;
+    left: calc(100vw - 100px);
+    top: calc((100vh / 2) - 30px);
+    font-size: 5em;
+    color: rgb(25, 25, 25, 0.05);
+}
+.next:hover {
+    color: rgb(25, 25, 25, 0.4);
+}
+/* =========================================================================== */
+/*  ワーニング
+/* =========================================================================== */
+.nodata {
+    color: #a94442;
+    background-color: #f2dede;
+    border-color: #ebccd1;
+    text-align: center;
+    width: 865px;
+    margin: 0 auto;
+}
+.alert {
+    color: #a94442;
+    background-color: #f2dede;
+    border-color: #ebccd1;
+    text-align: center;
+    font-weight: bold;
+}

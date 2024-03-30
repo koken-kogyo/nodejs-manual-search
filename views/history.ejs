@@ -1,0 +1,112 @@
+<!-- index.ejs -->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>手順書表示</title>
+    <link rel="stylesheet" href="/static/css/style-basic.css">
+</head>
+<body>
+    <!-- Header -->
+    <%- include("_header.ejs", { title: "手順書検索", req }) %>
+
+    <!-- Groups -->
+    <div id="navigate">
+    <div id="groups"  class="containers">
+        <ul id="navi-index">
+            <li></li>
+        </ul>
+        <ul class="alert">
+            <li></li>
+        </ul>
+    </div>
+    <hr>
+    </div>
+
+    <!-- Details -->
+    <div id="scroll-top"></div>
+    <div id="details">
+        details
+    </div>
+    <div id="scroll-bottom"></div>
+
+    <!-- Footer -->
+    <%- include("_footer.ejs", req) %>
+
+    <!-- ブラウザ読み込み完了後のJavaScriptを記述 -->
+    <script>
+        // Windows端末 以外は最終行を最初に表示
+        if (myOS() != "windows") {
+            let target = document.getElementById('scroll-bottom');
+            target.scrollIntoView(false);
+        }
+        // 工程場所 selector の change イベント作成
+        const select = document.querySelector('[name="select-odcd"]');
+        select.onchange = event => { 
+            const planday = document.getElementById("planday").value;
+            const odcd = select.value;
+            const disp = document.getElementById("disp").value;
+            location.replace(`/es/plan/${planday}/${odcd}/${disp}`);
+        }
+        // 工程グループ selector の change イベント作成
+        const selectG = document.querySelector('[name="select-odgcd"]');
+        selectG.onchange = event => { 
+            const planday = document.getElementById("planday").value;
+            const odcd = selectG.value; // 4桁で入ってくる
+            const disp = document.getElementById("disp").value;
+            location.replace(`/es/plan/${planday}/${odcd}/${disp}`);
+        }
+        function scriptTest(){
+            var userAgent = window.navigator.userAgent.toLowerCase(); 
+            alert(userAgent);
+        }
+        // 前日処理
+        function prevday(){
+            const prevday = document.getElementById("prevday").value;
+            const odcd = document.querySelector('[name="select-odcd"]').value;
+            const disp = document.getElementById("disp").value;
+            location.href = `/es/plan/${prevday}/${odcd}/${disp}`;
+        }
+        // 翌日処理
+        function nextday(){
+            const nextday = document.getElementById("nextday").value;
+            const odcd = document.querySelector('[name="select-odcd"]').value;
+            const disp = document.getElementById("disp").value;
+            location.href = `/es/plan/${nextday}/${odcd}/${disp}`;
+        }
+        // i-Reporter の起動
+        async function iReporter(){
+            const odcd = document.querySelector('[name="select-odcd"]').value;
+            // 起動時パラメータ ⇒ [クラスター名(要URLエンコード)]=[入力値]を & で繋ぐ
+            // URLエンコード:手配先コード ⇒ %E6%89%8B%E9%85%8D%E5%85%88%E3%82%B3%E3%83%BC%E3%83%89
+            // 簡単なテスト例）location.href = `jp.co.cimtops.ireporter.createreport:defid=350&%E5%85%A5%E5%BA%AB%E6%95%B0=100`;
+            // オンコーディングの理由：ブラウザからiRepo単一選択クラスターを選択させる方法がvalueでは出来ず表示文字列なら可能だった
+            let defid = 0;
+            let odcdparm = "";
+            // defid=350:炉中洩れ検査日報 (テスト運用時は476)
+            // defid=500:黄銅洩れ検査日報
+            // defid=499:炉中出口検査日報
+            if (odcd==="60707") { defid=476; odcdparm = encodeURI("ODCD=炉中洩検(1階)"); }
+            if (odcd==="60708") { defid=476; odcdparm = encodeURI("ODCD=炉中洩検(2階)"); }
+            if (odcd==="60500") { defid=500; odcdparm = encodeURI("ODCD=黄銅洩検"); }
+            if (odcd==="60717") { defid=499; odcdparm = encodeURI("ODCD=炉中目視(1階)"); }
+            if (odcd==="60718") { defid=499; odcdparm = encodeURI("ODCD=炉中目視(2階)"); }
+            if (odcd==="60727") { defid=499; odcdparm = encodeURI("ODCD=炉中目視(1階)"); }
+            if (odcd==="60728") { defid=499; odcdparm = encodeURI("ODCD=炉中目視(2階)"); }
+            if (defid == 0) {
+                location.href = "jp.co.cimtops.ireporter://open";
+            } else {
+                location.href = `jp.co.cimtops.ireporter.createreport:defid=${defid}&${odcdparm}`;
+            }
+            const sleepByPromise = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+            await sleepByPromise(2000);
+            window.close();
+            if (!window.closed) {
+                location.href = "https://192.168.96.72/";
+                console.log("ブラウザの履歴が残っているので自動では閉じることが出来ません！\nxボタンを押して閉じて下さい．");
+            }
+        }
+    </script>
+
+</body>
+</html>
