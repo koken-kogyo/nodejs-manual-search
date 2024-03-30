@@ -30,6 +30,9 @@ coverage/
 # production
 build/
 
+# severcert
+servercert/
+
 # misc
 .DS_Store
 .env.local
