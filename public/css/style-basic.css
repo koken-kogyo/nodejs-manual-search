@@ -63,8 +63,13 @@ footer>p {
 }
 #menutitle {
     position: fixed;
-    top: 3px;
+    top: 4px;
     left: calc(100vw / 2 - 3em);
+}
+#titlepage {
+    position: fixed;
+    top: 4px;
+    right: 30px;
 }
 #userinfo {
     display: inline-block;

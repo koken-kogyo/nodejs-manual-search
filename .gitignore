@@ -18,6 +18,9 @@ node_modules/
 # downloads
 downloads/
 
+# PDF
+pdfs/
+
 # sample sources
 sample/
 

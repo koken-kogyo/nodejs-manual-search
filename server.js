@@ -15,6 +15,7 @@ const server = https.createServer(options,app);
 
 // User定義
 const { PORT, log4jsConfig } = require("./config.js");
+const { getFolderName } = require("./handlers/server.js");
 const mysqlHandler = require("./handlers/mysql.js");
 
 // テンプレートエンジンの設定
@@ -28,14 +29,16 @@ app.use(favicon(`${__dirname}/public/images/favicon.ico`));
 app.get( "/", (req, res) => res.redirect(`https://${req.hostname}/`));
 
 // 初期表示
-app.get('/:odcd', (req, res) => {
-    res.render("index.ejs", {req});
+app.get('/:pdfcd', (req, res) => {
+    const folder = getFolderName(req.params.pdfcd);
+    res.render("index.ejs", {req, title: `手順書 ${folder}`});
 });
 
 // 品番検索
-app.get("/search/filename/:hmcd", (req, res) => {
+app.get("/search/filename/:pdfcd/:hmcd", (req, res) => {
+    const folder = getFolderName(req.params.pdfcd);
     const hmcd = req.params.hmcd;
-    const files = fs.readdirSync("./public/pdfs");
+    const files = fs.readdirSync(`./public/pdfs/${folder}`);
 
     // ここで入力品番からファイル名を特定
     const results = files.filter(fn => fn.indexOf(hmcd)!==-1);
@@ -95,7 +98,7 @@ app.get("/update/:odcd/:empno/:hmcd", async (req, res) => {
 mysqlHandler.connect
 .then(() => {
     console.log(`MySQL Database [${mysqlHandler.database}] Connected!`);
-    server.listen(PORT, () => {console.log(`Koken Procedure Manuals listen on Port:${PORT}`)});
+    server.listen(PORT, () => {console.log(`Koken Manuals Search listen on Port:${PORT}`)});
 }).catch((err) => {
     console.log("MySQL Database Connection Error!");
     console.log(err);
