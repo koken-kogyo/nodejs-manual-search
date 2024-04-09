@@ -3,24 +3,23 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>手順書表示</title>
+    <title>履歴表示</title>
     <link rel="stylesheet" href="/static/css/style-basic.css">
+    <link rel="stylesheet" href="/static/css/style-index.css">
 </head>
 <body>
     <!-- Header -->
-    <%- include("_header.ejs", { title: "手順書検索", req }) %>
+    <%- include("_header.ejs", { title: title, req }) %>
 
-    <!-- Groups -->
-    <div id="navigate">
-    <div id="groups"  class="containers">
-        <ul id="navi-index">
-            <li></li>
-        </ul>
-        <ul class="alert">
-            <li></li>
-        </ul>
-    </div>
-    <hr>
+    <!-- Navigator -->
+    <div id="history-navi">
+        <div id="navi-item">
+            <ul>
+                <li><button>Button1</button></li>
+                <li><button>Button2</button></li>
+                <li><button>Button3</button></li>
+            </ul>
+        </div>
     </div>
 
     <!-- Details -->

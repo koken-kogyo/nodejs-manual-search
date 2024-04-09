@@ -181,3 +181,26 @@ input[type='text']:focus {
     text-align: center;
     font-weight: bold;
 }
+/* =========================================================================== */
+/*  履歴表示
+/* =========================================================================== */
+#history-navi {
+    position: absolute;
+    width: calc(240px);
+    height: calc(100% - 40px - 20px - 20px);
+    top: 50px;
+    left: 10px;
+    background: rgb(160, 0, 0, 0.5);
+}
+#navi-item {
+    position: absolute;
+    bottom: 0px;
+    width: 100%;
+}
+ul {
+    padding: 0px;
+}
+#navi-item ul li {
+    list-style: none;
+    margin-top: 10px;
+}

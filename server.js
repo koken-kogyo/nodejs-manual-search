@@ -34,7 +34,13 @@ app.get('/:pdfcd', (req, res) => {
     res.render("index.ejs", {req, title: `手順書 ${folder}`});
 });
 
-// 品番検索
+// 履歴表示
+app.get('/history/:pdfcd', (req, res) => {
+    const folder = getFolderName(req.params.pdfcd);
+    res.render("history.ejs", {req, title: `${folder} 履歴`});
+});
+
+// 品番検索 API
 app.get("/search/filename/:pdfcd/:hmcd", (req, res) => {
     const folder = getFolderName(req.params.pdfcd);
     const hmcd = req.params.hmcd;
@@ -51,7 +57,7 @@ app.get("/search/filename/:pdfcd/:hmcd", (req, res) => {
     }
 });
 
-// 担当者検索
+// 担当者検索 API
 app.get("/search/km0010/:empno", async (req, res) => {
     const empno = req.params.empno;
     try {
@@ -66,7 +72,7 @@ app.get("/search/km0010/:empno", async (req, res) => {
     }
 });
 
-// 目視検査履歴ファイル登録
+// 目視検査履歴ファイル登録 API
 app.get("/insert/:odcd/:empno/:hmcd", async (req, res) => {
     const odcd = req.params.odcd;
     const empno = req.params.empno;
@@ -80,7 +86,7 @@ app.get("/insert/:odcd/:empno/:hmcd", async (req, res) => {
     }
 });
 
-// 目視検査履歴ファイル更新（作業終了）
+// 目視検査履歴ファイル更新（作業終了） API
 app.get("/update/:odcd/:empno/:hmcd", async (req, res) => {
     const odcd = req.params.odcd;
     const empno = req.params.empno;
