@@ -13,19 +13,78 @@
 
     <!-- Navigator -->
     <div id="history-navi">
-        <div id="navi-item">
-            <ul>
-                <li><button>Button1</button></li>
-                <li><button>Button2</button></li>
-                <li><button>Button3</button></li>
-            </ul>
+
+        <div id="history-navi-items">
+
+            <div>　</div>
+            <div class="button-title">History Today</div>
+            <button id="history-today" class="switch checked">当日履歴</button>
+
+            <div class="button-title">History Month</div>
+            <button id="history-month" class="switch">過去１か月履歴</button>
+
+            <div>　</div>
+            <td class="text">社員番号で絞り込み</td>
+            <div class="button-title">Extrac Employee No</div>
+            <table class="setting-items">
+                <tr>
+                    <td>
+                        <select id="select-tancd" name="select-tancd" title="担当者の選択" class="select">
+                            <option value="">全ての社員</option>
+                            <option value="11014">11014:渡辺善行</option>
+                            <option value="10095">10095:村松久範</option>
+                            <option value="11178">11178:太箸雄一</option>
+                        </select>
+                    </td>
+                </tr>
+            </table><br>
+
+            <td class="text">品番で絞り込み</td>
+            <div class="button-title">Extrac Product Code</div>
+            <table class="setting-items">
+                <tr>
+                    <td>
+                        <select id="select-hmcd" name="select-hmcd" title="品番の選択" class="select">
+                            <option value="">全ての品番</option>
+                            <option value="T1855-70743">T1855-70743</option>
+                        </select>
+                    </td>
+                </tr>
+            </table><br>
+
         </div>
+
+        <div id="history-navi-button">
+            <div class="button-title">Browser Back</div>
+            <a href="javascript:history.back()">
+                <button class="button">戻る</button>
+            </a>
+            <div class="button-title">Finish</div>
+            <a href="javascript:Finish()">
+                <button class="button">作業終了</button>
+            </a>
+    </div>
     </div>
 
     <!-- Details -->
     <div id="scroll-top"></div>
-    <div id="details">
-        details
+    <div id="history">
+        <table>
+            <tr>
+                <th>No</th>
+                <th>品番</th>
+                <th>開始</th>
+                <th>終了</th>
+                <th>時間</th>
+            </tr>
+            <tr>
+                <td>1</td>
+                <td>T1855-70743</td>
+                <td>11:53</td>
+                <td>12:08</td>
+                <td>10分</td>
+            </tr>
+        </table>
     </div>
     <div id="scroll-bottom"></div>
 
@@ -33,32 +92,44 @@
     <%- include("_footer.ejs", req) %>
 
     <!-- ブラウザ読み込み完了後のJavaScriptを記述 -->
-    <script>
-        // Windows端末 以外は最終行を最初に表示
-        if (myOS() != "windows") {
-            let target = document.getElementById('scroll-bottom');
-            target.scrollIntoView(false);
+    <script type="text/javascript">
+
+        // イベントリスナーを設定
+        const oHistoryToday = document.getElementById("history-today");
+        const oHistoryMonth = document.getElementById("history-month");
+        oHistoryToday.addEventListener("click", historyTodayClick);
+        oHistoryMonth.addEventListener("click", historyMonthClick);
+
+        // 当日履歴クリック
+        function historyTodayClick() {
+            oHistoryToday.className = "switch checked";
+            oHistoryMonth.className = "switch";
         }
-        // 工程場所 selector の change イベント作成
-        const select = document.querySelector('[name="select-odcd"]');
-        select.onchange = event => { 
-            const planday = document.getElementById("planday").value;
-            const odcd = select.value;
-            const disp = document.getElementById("disp").value;
-            location.replace(`/es/plan/${planday}/${odcd}/${disp}`);
+
+        // 過去１か月履歴クリック
+        function historyMonthClick() {
+            oHistoryToday.className = "switch";
+            oHistoryMonth.className = "switch checked";
         }
-        // 工程グループ selector の change イベント作成
-        const selectG = document.querySelector('[name="select-odgcd"]');
-        selectG.onchange = event => { 
-            const planday = document.getElementById("planday").value;
-            const odcd = selectG.value; // 4桁で入ってくる
-            const disp = document.getElementById("disp").value;
-            location.replace(`/es/plan/${planday}/${odcd}/${disp}`);
+
+        // 社員番号 selector の change イベント作成
+        const oSelectTancd = document.querySelector('[name="select-tancd"]');
+        oSelectTancd.onchange = event => {
+            alert(oSelectTancd.value + ":" + oSelectHmcd.value);
         }
+
+        // 品番 selector の change イベント作成
+        const oSelectHmcd = document.getElementById("select-hmcd");
+        oSelectHmcd.onchange = event => { 
+            alert(oSelectTancd.value + ":" + oSelectHmcd.value);
+        }
+
+        // Test
         function scriptTest(){
             var userAgent = window.navigator.userAgent.toLowerCase(); 
             alert(userAgent);
         }
+
         // 前日処理
         function prevday(){
             const prevday = document.getElementById("prevday").value;
@@ -72,38 +143,6 @@
             const odcd = document.querySelector('[name="select-odcd"]').value;
             const disp = document.getElementById("disp").value;
             location.href = `/es/plan/${nextday}/${odcd}/${disp}`;
-        }
-        // i-Reporter の起動
-        async function iReporter(){
-            const odcd = document.querySelector('[name="select-odcd"]').value;
-            // 起動時パラメータ ⇒ [クラスター名(要URLエンコード)]=[入力値]を & で繋ぐ
-            // URLエンコード:手配先コード ⇒ %E6%89%8B%E9%85%8D%E5%85%88%E3%82%B3%E3%83%BC%E3%83%89
-            // 簡単なテスト例）location.href = `jp.co.cimtops.ireporter.createreport:defid=350&%E5%85%A5%E5%BA%AB%E6%95%B0=100`;
-            // オンコーディングの理由：ブラウザからiRepo単一選択クラスターを選択させる方法がvalueでは出来ず表示文字列なら可能だった
-            let defid = 0;
-            let odcdparm = "";
-            // defid=350:炉中洩れ検査日報 (テスト運用時は476)
-            // defid=500:黄銅洩れ検査日報
-            // defid=499:炉中出口検査日報
-            if (odcd==="60707") { defid=476; odcdparm = encodeURI("ODCD=炉中洩検(1階)"); }
-            if (odcd==="60708") { defid=476; odcdparm = encodeURI("ODCD=炉中洩検(2階)"); }
-            if (odcd==="60500") { defid=500; odcdparm = encodeURI("ODCD=黄銅洩検"); }
-            if (odcd==="60717") { defid=499; odcdparm = encodeURI("ODCD=炉中目視(1階)"); }
-            if (odcd==="60718") { defid=499; odcdparm = encodeURI("ODCD=炉中目視(2階)"); }
-            if (odcd==="60727") { defid=499; odcdparm = encodeURI("ODCD=炉中目視(1階)"); }
-            if (odcd==="60728") { defid=499; odcdparm = encodeURI("ODCD=炉中目視(2階)"); }
-            if (defid == 0) {
-                location.href = "jp.co.cimtops.ireporter://open";
-            } else {
-                location.href = `jp.co.cimtops.ireporter.createreport:defid=${defid}&${odcdparm}`;
-            }
-            const sleepByPromise = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-            await sleepByPromise(2000);
-            window.close();
-            if (!window.closed) {
-                location.href = "https://192.168.96.72/";
-                console.log("ブラウザの履歴が残っているので自動では閉じることが出来ません！\nxボタンを押して閉じて下さい．");
-            }
         }
     </script>
 

@@ -22,7 +22,7 @@
 /* desktop-pc-size: 1300px～ */
 @media screen and (min-width: 1300px) and (min-height: 800px) {
     #containers {
-        grid-template-columns: 20em auto;
+        grid-template-columns: 320px auto;
     }
 }
 /* =========================================================================== */
@@ -34,8 +34,8 @@
     padding-top: 20px;
     padding-bottom: 20px;
     grid-template-columns: 1fr;
-    grid-template-rows: 7rem 8rem 7rem 1fr 4.7rem 4.7rem 4.7rem;
-    background: #f8f8f8;
+    grid-template-rows: 7rem 8rem 7rem 1fr;
+    background: rgb(248, 248, 248);
     font-size: 1.0em; /* ベースフォントサイズ */
 }
 /* 画面の比率が A3比率 [√2:1] 以下の 縦長画面の場合は上下にナビゲーションを配置 */
@@ -82,8 +82,10 @@ input[type='text']:focus {
 }
 .button {
     margin-left: 0.5em;
+    margin-bottom: 0.5em;
     width: calc(100% - 1em);
-    padding: 0.2em 1.5em;
+    padding-top: 0.3em;
+    padding-inline: 1.5em;
     border: 1.5px solid #2589d0;
     border-radius: 5px;
     background-color: #fff;
@@ -95,11 +97,44 @@ input[type='text']:focus {
     color: #fff;
     cursor: pointer;
 }
+.switch {
+    margin-left: 0.5em;
+    margin-bottom: 0.5em;
+    width: calc(100% - 1em);
+    padding-top: 0.3em;
+    padding-inline: 1.5em;
+    border: 1.5px solid #888;
+    border-radius: 5px;
+    background-color: rgb(180, 180, 180, 0.6);
+    color: #666;
+    font-size: 1.5em;
+}
+.switch:hover {
+    cursor: pointer;
+}
+.checked {
+    background-color: #2589d0;
+    color: #fff;
+}
+.select {
+    font-size: 1.2em;
+    padding: 3px;
+    padding-left: 10px;
+    width: 13em;
+    border: 0.1px solid rgba(163, 243, 214, 0.3);
+    border-radius: 0.2em;
+    color:rgb(55, 82, 72);
+    background-color: rgba(163, 243, 214, 0.3);
+    box-shadow: 2px 2px 4px gray;
+    outline: none;
+    cursor: pointer;
+}
 @media screen and (min-width: 1300px) and (min-height: 800px) {
     #worker { margin-inline: 1em; }
     .large { margin-left: 1em; }
     .normal { margin-left: 2em; }
-    .button { margin-left: 1em; width: calc(100% - 2em); }
+    .button { margin-left: 1em; margin-bottom: 1em; width: calc(100% - 2em); }
+    .switch { margin-left: 1em; margin-bottom: 1em; width: calc(100% - 2em); }
     input[type='text'] { margin-left: calc(1.3em + 1px); width: calc(100% - 3.6em - 2px); }    
 }
 /* =========================================================================== */
@@ -185,22 +220,25 @@ input[type='text']:focus {
 /*  履歴表示
 /* =========================================================================== */
 #history-navi {
-    position: absolute;
-    width: calc(240px);
-    height: calc(100% - 40px - 20px - 20px);
+    position: relative;
+    height: calc(100% - 40px - 20px - 30px);
+    width: 320px;
     top: 50px;
-    left: 10px;
-    background: rgb(160, 0, 0, 0.5);
+    left: 0px;
+    border-radius: 5px;
+    background: rgb(248, 248, 248);
 }
-#navi-item {
+#history-navi-button {
     position: absolute;
     bottom: 0px;
     width: 100%;
 }
-ul {
-    padding: 0px;
-}
-#navi-item ul li {
-    list-style: none;
-    margin-top: 10px;
+#history {
+    position: absolute;
+    width: calc(100% - 320px - 30px);
+    height: calc(100% - 40px - 20px - 30px);
+    top: 50px;
+    left: 330px;
+    border-radius: 5px;
+    background: rgb(160, 0, 0, 0.5);
 }
