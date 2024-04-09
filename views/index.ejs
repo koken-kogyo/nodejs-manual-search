@@ -6,7 +6,7 @@
     <title>電子マニュアル</title>
     <!-- レスポンシブwebデザインの指定 --><!-- デバイスの横幅合わせ,等倍表示（半角空白入れるな！） -->
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <link href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" rel="stylesheet">
+    <!-- link href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" rel="stylesheet" -->
     <link rel="stylesheet" href="/static/css/style-basic.css">
     <link rel="stylesheet" href="/static/css/style-index.css">
 </head>
@@ -74,7 +74,8 @@
     <%- include("_footer.ejs", req) %>
 
     <!-- ブラウザ読み込み完了後のJavaScriptを記述 -->
-    <script>
+    <script type="text/javascript">
+
         // キーダウンイベントリスナーを設定
         const inputEmpno = document.getElementById("input-empno");
         const inputHmcd = document.getElementById("input-hmcd");
@@ -134,7 +135,7 @@
             if (e.key === "Enter" && this.value !== "") {
 
                 // 終了処理で入力ボックスがクリアされる前に変数に格納
-                const inputHmcd = document.getElementById("input-hmcd").value;
+                let inputHmcd = document.getElementById("input-hmcd").value;
 
                 // 作業中が存在した場合、終了処理を先に行う
                 const searchhmcd = document.getElementById("searchhmcd").value;
@@ -165,6 +166,7 @@
                     if (aryfn.length == 1) {
                         titlepage.innerText = "作業中";
                         document.getElementById("input-hmcd").value = hmcd;
+                        inputHmcd = hmcd;
                     }
                     
                     // 複数Hitした場合、作業開始ボタン、ページ切替ボタンを表示
@@ -172,8 +174,8 @@
                     let next = "";
                     if (aryfn.length > 1) {
                         titlepage.innerText = aryfn.length + "件Hit";
-                        play = "<a href='javascript:play()'><i class='fas fa-play-circle play'></i></a>";
-                        next = "<a href='javascript:next()'><i class='fas fa-chevron-circle-right next'></i></a>";
+                        play = "<a href='javascript:play()'><img class='play' src='/static/images/fa-play-circle.png'></a>";
+                        next = "<a href='javascript:next()'><img class='next' src='/static/images/fa-chevron-circle-right.png'></a>";
                     }
 
                     // PDF表示
@@ -181,7 +183,8 @@
                     const pdfPath = `/static/pdfs/${subFolder}/`;
                     const pdfName = aryfn[0];
                     const pdfPara = "#view=FitV&toolbar=0&zoom=FitV";
-                    output.innerHTML = `<iframe src='${pdfPath}${pdfName}${pdfPara}' width='100%' height='100%' frameborder='0' style='border:none;'></iframe>${play}${next}`;
+                    output.innerHTML = `<iframe src='${pdfPath}${pdfName}${pdfPara}' width='100%' height='100%' frameborder='0' 
+                    style='border:none;'></iframe>${play}${next}`;
 
                     // 作業履歴ファイルDB更新
                     if (aryfn.length == 1) {
@@ -225,9 +228,9 @@
             document.getElementById("titlepage").innerText = "作業中";
             document.getElementById("input-hmcd").value = hmcd;
             document.getElementById("searchhmcd").value = hmcd;
-            document.querySelector(".prev").style.display = "none";
-            document.querySelector(".play").style.display = "none";
-            document.querySelector(".next").style.display = "none";
+            if (document.querySelector(".prev")) { document.querySelector(".prev").style.display = "none"; }
+            if (document.querySelector(".play")) { document.querySelector(".play").style.display = "none"; }
+            if (document.querySelector(".next")) { document.querySelector(".next").style.display = "none"; }
 
             const xmlHttpRequest = new XMLHttpRequest();
             xmlHttpRequest.open('GET', `/insert/${pdfcd}/${empno}/${hmcd}`, false);
@@ -262,13 +265,13 @@
                 const hmcd = fns[pageno - 1].split("_")[2].toUpperCase().replace(".PDF", "");
 
                 // 作業開始ボタン、ページ切替ボタンを表示
-                let prev = "<a href='javascript:prev()'><i class='fas fa-chevron-circle-left prev'></i></a>";
-                let play = "<a href='javascript:play()'><i class='fas fa-play-circle play'></i></a>";
+                let prev = "<a href='javascript:prev()'><img class='prev' src='/static/images/fa-chevron-circle-left.png'></a>";
+                let play = "<a href='javascript:play()'><img class='play' src='/static/images/fa-play-circle.png'></a>";
                 let next = "";
                 if (fns.length == pageno) {
                     next = "";
                 } else {
-                    next = "<a href='javascript:next()'><i class='fas fa-chevron-circle-right next'></i></a>";
+                    next = "<a href='javascript:next()'><img class='next' src='/static/images/fa-chevron-circle-right.png'></a>";
                 }
 
                 // PDF表示
@@ -326,10 +329,10 @@
                 if (pageno == 1) {
                     prev = "";
                 } else {
-                    prev = "<a href='javascript:prev()'><i class='fas fa-chevron-circle-left prev'></i></a>";
+                    prev = "<a href='javascript:prev()'><img class='prev' src='/static/images/fa-chevron-circle-left.png'></a>";
                 }
-                let play = "<a href='javascript:play()'><i class='fas fa-play-circle play'></i></a>";
-                let next = "<a href='javascript:next()'><i class='fas fa-chevron-circle-right next'></i></a>";
+                let play = "<a href='javascript:play()'><img class='play' src='/static/images/fa-play-circle.png'></a>";
+                let next = "<a href='javascript:next()'><img class='next' src='/static/images/fa-chevron-circle-right.png'></a>";
                 
                 // PDF表示
                 const subFolder = (pdfcd == "6077") ? "【検証用】炉出口検査PDF" : "【検証用】炉投入荷姿PDF";

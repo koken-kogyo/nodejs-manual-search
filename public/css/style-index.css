@@ -122,30 +122,45 @@ input[type='text']:focus {
     position: fixed;
     left: 80px;
     top: calc((100vh / 2) - 30px);
+    /* PNGイメージを使用する場合の指定 */
+    width: 100px;
+    opacity: 0.05;
+    /* web-font [fa-chevron-circle-left] を使用する場合の指定 */
     font-size: 5em;
     color: rgb(25, 25, 25, 0.05);
 }
 .prev:hover {
+    opacity: 0.4;
     color: rgb(25, 25, 25, 0.4);
 }
 .play {
     position: fixed;
     top: calc((100vh / 2) - 60px);
     left: calc((100vw / 2));
+    /* PNGイメージを使用する場合の指定 */
+    width: 150px;
+    opacity: 0.2;
+    /* web-font [fa-chevron-circle-left] を使用する場合の指定 */
     font-size: 10em;
     color: rgb(25, 25, 25, 0.2);
 }
 .play:hover {
+    opacity: 0.6;
     color: rgb(25, 25, 25, 0.4);
 }
 .next {
     position: fixed;
     left: calc(100vw - 100px);
     top: calc((100vh / 2) - 30px);
+    /* PNGイメージを使用する場合の指定 */
+    width: 100px;
+    opacity: 0.05;
+    /* web-font [fa-chevron-circle-left] を使用する場合の指定 */
     font-size: 5em;
     color: rgb(25, 25, 25, 0.05);
 }
 .next:hover {
+    opacity: 0.4;
     color: rgb(25, 25, 25, 0.4);
 }
 /* =========================================================================== */
