@@ -191,6 +191,7 @@
                         xmlHttpRequest.open('GET', `/insert/${pdfcd}/${empno}/${hmcd}`, false);
                         xmlHttpRequest.send();
                         if (xmlHttpRequest.readyState == 4 && xmlHttpRequest.status == 299 ) {
+                            alert(pfdcd + ":" + empno + ":" + hmcd + ":");
                             alert("目視検査履歴ファイルの登録に失敗しました\n\nシステム担当者に連絡した上で\n作業は継続してください．");
                         }
                     }
@@ -409,7 +410,8 @@
         // 履歴表示
         function ViewHistory() {
             const pdfcd = document.getElementById("pdfcd").value;
-            location.href = `/history/${pdfcd}`;
+//            location.href = `/history/${pdfcd}`;
+            window.open(`/history/${pdfcd}`);
         }
     </script>
 

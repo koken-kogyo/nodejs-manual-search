@@ -16,7 +16,7 @@
 
         <div id="history-navi-items">
 
-            <div>　</div>
+            <div class="large">検索期間指定:</div>
             <div class="button-title">History Today</div>
             <button id="history-today" class="switch checked">当日履歴</button>
 
@@ -24,40 +24,23 @@
             <button id="history-month" class="switch">過去１か月履歴</button>
 
             <div>　</div>
-            <td class="text">社員番号で絞り込み</td>
-            <div class="button-title">Extrac Employee No</div>
-            <table class="setting-items">
-                <tr>
-                    <td>
-                        <select id="select-tancd" name="select-tancd" title="担当者の選択" class="select">
-                            <option value="">全ての社員</option>
-                            <option value="11014">11014:渡辺善行</option>
-                            <option value="10095">10095:村松久範</option>
-                            <option value="11178">11178:太箸雄一</option>
-                        </select>
-                    </td>
-                </tr>
-            </table><br>
+            <div class="large">絞り込み条件:</div>
+            <div class="normal">社員番号で絞り込み [ Extrac Employee No ]</div>
+            <select id="select-empno" name="select-empno" title="担当者の選択" class="select">
+            </select>
 
-            <td class="text">品番で絞り込み</td>
-            <div class="button-title">Extrac Product Code</div>
-            <table class="setting-items">
-                <tr>
-                    <td>
-                        <select id="select-hmcd" name="select-hmcd" title="品番の選択" class="select">
-                            <option value="">全ての品番</option>
-                            <option value="T1855-70743">T1855-70743</option>
-                        </select>
-                    </td>
-                </tr>
-            </table><br>
+            <div class="normal">品番で絞り込み [ Extrac Product Code ]</div>
+            <select id="select-hmcd" name="select-hmcd" title="品番の選択" class="select">
+                <option value="">全ての品番</option>
+                <option value="T1855-70743">T1855-70743</option>
+            </select>
 
         </div>
 
         <div id="history-navi-button">
-            <div class="button-title">Browser Back</div>
-            <a href="javascript:history.back()">
-                <button class="button">戻る</button>
+            <div class="button-title">Window Close</div>
+            <a href="javascript:window.close()">
+                <button class="button">閉じる</button>
             </a>
             <div class="button-title">Finish</div>
             <a href="javascript:Finish()">
@@ -69,13 +52,18 @@
     <!-- Details -->
     <div id="scroll-top"></div>
     <div id="history">
-        <table>
+        <table id="tbl1">
             <tr>
-                <th>No</th>
-                <th>品番</th>
-                <th>開始</th>
-                <th>終了</th>
-                <th>時間</th>
+                <th width="40px" rowspan="2">No</th>
+                <th width="200px" rowspan="2">品番</th>
+                <th width="80px" rowspan="2">日付</th>
+                <th width="200px" colspan="2">時刻</th>
+                <th width="100px" rowspan="2">作業時間</th>
+                <th width="100px" rowspan="2">作業者</th>
+            </tr>
+            <tr>
+                <th width="100px">開始</th>
+                <th width="100px">終了</th>
             </tr>
             <tr>
                 <td>1</td>
@@ -84,9 +72,18 @@
                 <td>12:08</td>
                 <td>10分</td>
             </tr>
+            <tr>
+                <td>2</td>
+                <td>T1855-70743</td>
+                <td>11:53</td>
+                <td>12:08</td>
+                <td>10分</td>
+            </tr>
         </table>
+        <br><br>
     </div>
     <div id="scroll-bottom"></div>
+    <input type="hidden" name="pdfcd" id="pdfcd" value="<%= req.params.pdfcd %>">
 
     <!-- Footer -->
     <%- include("_footer.ejs", req) %>
@@ -94,35 +91,31 @@
     <!-- ブラウザ読み込み完了後のJavaScriptを記述 -->
     <script type="text/javascript">
 
-        // イベントリスナーを設定
+        // オブジェクト変数設定
         const oHistoryToday = document.getElementById("history-today");
         const oHistoryMonth = document.getElementById("history-month");
-        oHistoryToday.addEventListener("click", historyTodayClick);
-        oHistoryMonth.addEventListener("click", historyMonthClick);
-
-        // 当日履歴クリック
-        function historyTodayClick() {
+        const oSelectEmpno = document.getElementById("select-empno");
+        const oSelectHmcd = document.getElementById("select-hmcd");
+        
+        // 当日履歴クリック イベントリスナー設定
+        oHistoryToday.onclick = event => {
             oHistoryToday.className = "switch checked";
             oHistoryMonth.className = "switch";
+            getHistory();
         }
 
-        // 過去１か月履歴クリック
-        function historyMonthClick() {
+        // 過去１か月履歴クリック イベントリスナー設定
+        oHistoryMonth.onclick = event => {
             oHistoryToday.className = "switch";
             oHistoryMonth.className = "switch checked";
+            getHistory();
         }
 
-        // 社員番号 selector の change イベント作成
-        const oSelectTancd = document.querySelector('[name="select-tancd"]');
-        oSelectTancd.onchange = event => {
-            alert(oSelectTancd.value + ":" + oSelectHmcd.value);
-        }
+        // 社員番号 selector の change イベントリスナー設定
+        oSelectEmpno.onchange = event => { getHistory(); }
 
-        // 品番 selector の change イベント作成
-        const oSelectHmcd = document.getElementById("select-hmcd");
-        oSelectHmcd.onchange = event => { 
-            alert(oSelectTancd.value + ":" + oSelectHmcd.value);
-        }
+        // 品番 selector の change イベントリスナー設定
+        oSelectHmcd.onchange = event => { getHistory(); }
 
         // Test
         function scriptTest(){
@@ -130,19 +123,115 @@
             alert(userAgent);
         }
 
-        // 前日処理
-        function prevday(){
-            const prevday = document.getElementById("prevday").value;
-            const odcd = document.querySelector('[name="select-odcd"]').value;
-            const disp = document.getElementById("disp").value;
-            location.href = `/es/plan/${prevday}/${odcd}/${disp}`;
+        // 電子マニュアル表示履歴ファイル検索表示処理
+        function getHistory() {
+            const pdfcd = document.getElementById("pdfcd").value;
+            const flg = (oHistoryToday.className == "switch checked") ? "T" : "M";
+            const empno = oSelectEmpno.value;
+            const hmcd = oSelectHmcd.value;
+            fetch(`/get/kd8230/${pdfcd}:${flg}:${empno}:${hmcd}:`)
+            .then(response => response.json())
+            .then(data => {
+                // 今表示されているテーブルのヘッダー以外を全削除
+                let table = document.getElementById("tbl1");
+                let i = 1;
+                do {
+                    if (table.rows.length > 2) {table.deleteRow(-1);}
+                } while (table.rows.length > 2);
+                // APIで取得したデータをテーブ行に追加
+                data.forEach(function (d) {
+                    let newRow = table.insertRow();
+                    appendTD(newRow, i, "");
+                    appendTD(newRow, d.HMCD, "");
+                    appendTD(newRow, d.WKSTDT2, "");
+                    appendTD(newRow, d.WKSTTM2, "");
+                    appendTD(newRow, d.WKEDTM2, "");
+                    appendTD(newRow, (d.WKTIME=="-") ?"-" : d.WKTIME + "m", "");
+                    appendTD(newRow, d.OPNAME, "");
+                    i++;
+                });
+            });
         }
-        // 翌日処理
-        function nextday(){
-            const nextday = document.getElementById("nextday").value;
+        function appendTD(newrow, str, name){
+            let newCell = newrow.insertCell();
+            let newText = document.createTextNode(str);
+            newCell.appendChild(newText);
+            if (name!="") {newCell.className = name;}
+        }
+
+        // CSVダウンロード処理
+        function csvdownload(){
+            const planday = document.getElementById("planday").value;
             const odcd = document.querySelector('[name="select-odcd"]').value;
-            const disp = document.getElementById("disp").value;
-            location.href = `/es/plan/${nextday}/${odcd}/${disp}`;
+            const date = new Date();                        //現在時刻を取得
+            const y = date.getFullYear(),                   //西暦年
+                m = ("0" + (date.getMonth() + 1)).slice(-2),//月　
+                d = ("0" + date.getDate()).slice(-2),       //日
+                H = ("0" + date.getHours()).slice(-2),      //時
+                M = ("0" + date.getMinutes()).slice(-2),    //分
+                S = ("0" + date.getSeconds()).slice(-2);    //秒
+            const time = `${H}${M}`;
+            /* alert(`${y}/${m}/${d} ${H}:${M}:${S}`); */
+            // (1) XMLHttpRequestオブジェクトを作成
+            const xmlHttpRequest = new XMLHttpRequest();
+            // (2) CSVデータ作成依頼
+            xmlHttpRequest.open('GET', `/es/makecsv/${planday}/${odcd}/${time}`, false); // 第3引数false:同期通信
+            xmlHttpRequest.send();
+            // (3) 同期処理終了後、ステータス判定
+            if (xmlHttpRequest.readyState == 4 && xmlHttpRequest.status == 200 ) {
+                // (4) CSVダウンロード済みにDOM更新 (1.img画像と2.リンク先)
+                const row = tbl1.rows.length;
+                for( var i = 2; i < row; i++ ){
+                    tbl1.rows[i].cells[13].innerHTML = "済";
+                }
+                const csvimg = document.getElementById("csvimg");
+                csvimg.src = "/static/images/csvnothing.png";
+                const csvref = document.getElementById("csvref");
+                csvref.href = "javascript:void(0)";
+                // (5) 完成したCSVファイルをダウンロード
+                location.href = `/static/downloads/es_${planday}_${odcd}_${time}.csv`;
+            }
+        }
+
+        // 絞り込み社員番号セレクトボックスの作成
+        function makeSelectEmpno() {
+            fetch("/get/selectemp")
+            .then(response => response.json())
+            .then(data => {
+                const oSelectEMPNO = document.getElementById("select-empno");
+                // 初期値を設定
+                oSelectEMPNO.innerHTML = "<option value=''>全ての社員</option>";
+                data.forEach(function (d) {
+                    let option = document.createElement("option");
+                    option.value = d.EMPNO;
+                    option.innerHTML = d.EMPNO + ":" + d.NAME;
+                    oSelectEMPNO.appendChild(option);
+                });
+            });
+        }
+
+        // 絞り込み品番セレクトボックスの作成
+        function makeSelectHMCD() {
+            fetch("/get/selecthmcd")
+            .then(response => response.json())
+            .then(data => {
+                const oSelectHMCD = document.getElementById("select-hmcd");
+                // 初期値を設定
+                oSelectHMCD.innerHTML = "<option value=''>全ての品番</option>";
+                data.forEach(function (d) {
+                    let option = document.createElement("option");
+                    option.value = d.HMCD;
+                    option.innerHTML = d.HMCD;
+                    oSelectHMCD.appendChild(option);
+                });
+            });
+        }
+
+        // 初期表示
+        window.onload = function() {            
+            makeSelectEmpno();
+            makeSelectHMCD();
+            getHistory();
         }
     </script>
 

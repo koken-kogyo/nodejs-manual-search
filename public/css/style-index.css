@@ -8,7 +8,7 @@
     width: 100vw;
     display: grid;
     background: rgb(250, 250, 250);
-    grid-template-columns: 14em auto;
+    grid-template-columns: 320px auto;
     grid-template-rows: 1fr;
 }
 /* 画面の比率が A3比率 [√2:1] 以下の 縦長画面の場合は上下にナビゲーションを配置 */
@@ -48,42 +48,42 @@
 }
 .large {
     font-size: 1.5em;
-    margin-left: 0.3em;
+    margin-left: 0.8em;
 }
 .normal {
     font-size: 0.8em;
     color: #999;
-    margin-left: 1em;
-    margin-bottom: 0.5em;
+    margin: 0.3em 0 0.3em 1.8em;
+}
+.button-title {
+    font-size: 0.8em;
+    color: #999;
+    text-align: center;
+    margin-bottom: 0.3em;
 }
 #worker {
     display: flex;
     font-size: 1.5em;
-    margin-inline: 0.3em;
+    margin-inline: 0.8em;
     padding: 0.3em;
     color: #fff;
     background: #2589d0;
 }
 input[type='text'] {
     font-size: 1em;
-    margin-inline: 0.5em;
+    margin-inline: 1.2em;
     padding: 0.3em;
     border: 1px solid rgba(82, 223, 0, 0.936);
+    width: calc(100% - 3.2em);
     outline: none;
 }
 input[type='text']:focus {
     box-shadow: 0 0 2px 2px rgba(233, 85, 85, 0.8);
 }
-.button-title {
-    font-size: 0.8em;
-    color: #999;
-    text-align: center;
-    margin-bottom: 2px;
-}
 .button {
-    margin-left: 0.5em;
-    margin-bottom: 0.5em;
-    width: calc(100% - 1em);
+    margin-left: 1em;
+    margin-bottom: 1em;
+    width: calc(100% - 2em);
     padding-top: 0.3em;
     padding-inline: 1.5em;
     border: 1.5px solid #2589d0;
@@ -98,9 +98,9 @@ input[type='text']:focus {
     cursor: pointer;
 }
 .switch {
-    margin-left: 0.5em;
-    margin-bottom: 0.5em;
-    width: calc(100% - 1em);
+    margin-left: 1em;
+    margin-bottom: 1em;
+    width: calc(100% - 2em);
     padding-top: 0.3em;
     padding-inline: 1.5em;
     border: 1.5px solid #888;
@@ -118,9 +118,10 @@ input[type='text']:focus {
 }
 .select {
     font-size: 1.2em;
-    padding: 3px;
-    padding-left: 10px;
-    width: 13em;
+    margin-left: 1.2em;
+    margin-bottom: 1em;
+    padding: 0.2em 0 0.2em 0.5em;
+    width: calc(100% - 1.5em - 1em);
     border: 0.1px solid rgba(163, 243, 214, 0.3);
     border-radius: 0.2em;
     color:rgb(55, 82, 72);
@@ -133,8 +134,6 @@ input[type='text']:focus {
     #worker { margin-inline: 1em; }
     .large { margin-left: 1em; }
     .normal { margin-left: 2em; }
-    .button { margin-left: 1em; margin-bottom: 1em; width: calc(100% - 2em); }
-    .switch { margin-left: 1em; margin-bottom: 1em; width: calc(100% - 2em); }
     input[type='text'] { margin-left: calc(1.3em + 1px); width: calc(100% - 3.6em - 2px); }    
 }
 /* =========================================================================== */
@@ -225,8 +224,9 @@ input[type='text']:focus {
     width: 320px;
     top: 50px;
     left: 0px;
+    padding-top: 10px;
     border-radius: 5px;
-    background: rgb(248, 248, 248);
+    background: rgb(248, 248, 248, 0.8);
 }
 #history-navi-button {
     position: absolute;
@@ -240,5 +240,67 @@ input[type='text']:focus {
     top: 50px;
     left: 330px;
     border-radius: 5px;
-    background: rgb(160, 0, 0, 0.5);
+    background: rgb(248, 248, 248, 0.8);
+    z-index: -1;
+}
+#history #tbl1 {
+    margin: auto;
+    margin-top: 10px;
+}
+#history tr {
+    background-color: #FEFEFE;
+}
+#history tr:nth-child(even) {
+    background-color: #ECECEC;
+}
+#history th {
+    border: solid 0.5px #1414141c;
+    background-color: rgb(225, 238, 253);
+}
+#history .th-big {
+    font-size: 1.4rem;
+}
+#history .th-small {
+    font-size: 0.8rem;
+}
+#history .th-large-small {
+    font-size: 0.6rem;
+}
+#history td {
+    text-align: center;
+    border: solid 0.5px #1414141c;
+    padding: 2px 0px ;
+    vertical-align: middle;
+    height: 36px;
+}
+#history .td-href {
+    color:rgb(0, 0, 0);
+    text-decoration: none;
+    font-weight: bold;
+    padding: 8px 0px;
+}
+#history .td-big {
+    font-weight: bold;
+}
+#history .td-small {
+    font-size: 0.8rem;
+}
+#history .td-large-small {
+    font-size: 0.7rem;
+}
+#history .lef {
+    text-align: left;
+}
+#history .s3 {
+    text-align: left;
+}
+#history .s4 {
+    text-align: left;
+    border-radius: 3px;
+    background-color: rgba(255, 105, 180, 0.3);
+}
+#history .s8 {
+    text-align: left;
+    border-radius: 3px;
+    background-color: rgba(250, 240, 20, 0.5);
 }

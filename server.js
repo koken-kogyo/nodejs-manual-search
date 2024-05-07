@@ -40,13 +40,13 @@ app.get('/history/:pdfcd', (req, res) => {
     res.render("history.ejs", {req, title: `${folder} 履歴`});
 });
 
-// 品番検索 API
+// PDFファイル検索 API
 app.get("/search/filename/:pdfcd/:hmcd", (req, res) => {
     const folder = getFolderName(req.params.pdfcd);
     const hmcd = req.params.hmcd;
     const files = fs.readdirSync(`./public/pdfs/${folder}`);
 
-    // ここで入力品番からファイル名を特定
+    // 入力品番から検索結果のファイル名一覧を取得
     const results = files.filter(fn => fn.indexOf(hmcd)!==-1);
 
     // const fn = files[no];
@@ -72,14 +72,44 @@ app.get("/search/km0010/:empno", async (req, res) => {
     }
 });
 
-// 目視検査履歴ファイル登録 API
-app.get("/insert/:odcd/:empno/:hmcd", async (req, res) => {
-    const odcd = req.params.odcd;
+// 電子マニュアル表示履歴ファイル取得 API
+app.get("/get/kd8230/:args", async (req, res, next) => {
+    try {
+        const kd8230 = await mysqlHandler.getKD8230(req.params.args);
+        res.status(200).json(kd8230);
+    } catch (err) {
+        next(err);
+    }
+});
+
+// 絞り込み用社員の取得 API
+app.get("/get/selectemp", async (req, res, next) => {
+    try {
+        const results = await mysqlHandler.getSelectEmployee();
+        res.status(200).json(results);
+    } catch (err) {
+        next(err);
+    }
+});
+
+// 絞り込み用品番の取得 API
+app.get("/get/selecthmcd", async (req, res, next) => {
+    try {
+        const results = await mysqlHandler.getSelectHMCD();
+        res.status(200).json(results);
+    } catch (err) {
+        next(err);
+    }
+});
+
+// 電子マニュアル表示履歴ファイル登録 API
+app.get("/insert/:pdfcd/:empno/:hmcd", async (req, res) => {
+    const pdfcd = req.params.pdfcd;
     const empno = req.params.empno;
     const hmcd = req.params.hmcd;
     try {
-        // console.log(odcd + ":" + empno + ":" + hmcd);
-        await mysqlHandler.insertKD8230(odcd, empno, hmcd);
+        // console.log(pdfcd + ":" + empno + ":" + hmcd);
+        await mysqlHandler.insertKD8230(pdfcd, empno, hmcd);
         res.status(200).end();
     } catch (err) {
         res.status(299).end();
@@ -87,17 +117,24 @@ app.get("/insert/:odcd/:empno/:hmcd", async (req, res) => {
 });
 
 // 目視検査履歴ファイル更新（作業終了） API
-app.get("/update/:odcd/:empno/:hmcd", async (req, res) => {
-    const odcd = req.params.odcd;
+app.get("/update/:pdfcd/:empno/:hmcd", async (req, res) => {
+    const pdfcd = req.params.pdfcd;
     const empno = req.params.empno;
     const hmcd = req.params.hmcd;
     try {
-        // console.log(odcd + ":" + empno + ":" + hmcd);
-        await mysqlHandler.updateKD8230(odcd, empno, hmcd);
+        // console.log(pdfcd + ":" + empno + ":" + hmcd);
+        await mysqlHandler.updateKD8230(pdfcd, empno, hmcd);
         res.status(200).end();
     } catch (err) {
         res.status(299).end();
     }
+});
+
+// 包括的エラーハンドリング
+app.use((err, req, res, next) => {
+    console.log("包括的エラーハンドリング")
+    console.error(err);
+    res.status(500).send(`サーバーの動作が失敗しました．:${err.code} `);
 });
 
 // データベース接続 確証後にサーバーを起動
