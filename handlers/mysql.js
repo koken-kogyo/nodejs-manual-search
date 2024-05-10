@@ -57,6 +57,7 @@ exports.getKD8230 = async (args) => {
     let param1 = "";
     if (flg == "T") {   // Today
         param1 = "and WKSTDT between curdate() and date_add(curdate(),interval 1 day) ";
+        param1 = "and WKSTDT between date_add(curdate(),interval -1 day) and date_add(curdate(),interval 1 day) ";
     } else {            // Month
         param1 = "and WKSTDT between date_add(curdate(),interval -1 month) and date_add(curdate(),interval 1 day) ";
     }
@@ -88,12 +89,12 @@ exports.getKD8230 = async (args) => {
 
 // 社員氏名の取得
 exports.getSelectEmployee = async () => {
-    const sql = "select distinct a.EMPNO, b.NAME from kd8230 a, km0010 b where a.EMPNO=b.EMPNO"
+    const sql = "select distinct a.EMPNO, b.NAME from kd8230 a, km0010 b where a.EMPNO=b.EMPNO order by a.EMPNO"
     return getDatabase(sql, "");
 };
 
 // 社員氏名の取得
 exports.getSelectHMCD = async () => {
-    const sql = "select distinct HMCD from kd8230"
+    const sql = "select distinct HMCD from kd8230 order by HMCD"
     return getDatabase(sql, "");
 };

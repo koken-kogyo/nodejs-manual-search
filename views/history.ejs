@@ -59,7 +59,7 @@
                 <th width="80px" rowspan="2">日付</th>
                 <th width="200px" colspan="2">時刻</th>
                 <th width="100px" rowspan="2">作業時間</th>
-                <th width="100px" rowspan="2">作業者</th>
+                <th width="200px" rowspan="2">作業者</th>
             </tr>
             <tr>
                 <th width="100px">開始</th>
@@ -139,16 +139,21 @@
                     if (table.rows.length > 2) {table.deleteRow(-1);}
                 } while (table.rows.length > 2);
                 // APIで取得したデータをテーブ行に追加
-                data.forEach(function (d) {
+                if (flg == "M") { data.reverse(); }
+                data.some(function (d) {
                     let newRow = table.insertRow();
                     appendTD(newRow, i, "");
                     appendTD(newRow, d.HMCD, "");
                     appendTD(newRow, d.WKSTDT2, "");
                     appendTD(newRow, d.WKSTTM2, "");
                     appendTD(newRow, d.WKEDTM2, "");
-                    appendTD(newRow, (d.WKTIME=="-") ?"-" : d.WKTIME + "m", "");
+                    appendTD(newRow, (d.WKTIME=="-") ?"-" : d.WKTIME + "分", "");
                     appendTD(newRow, d.OPNAME, "");
                     i++;
+                    if ( flg == "M" && i > 300 ) {
+                        alert("検索結果が300件を超えました！\n条件の絞り込みをして下さい．");
+                        return true;
+                    }
                 });
             });
         }

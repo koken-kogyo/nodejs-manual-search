@@ -241,7 +241,6 @@ input[type='text']:focus {
     left: 330px;
     border-radius: 5px;
     background: rgb(248, 248, 248, 0.8);
-    z-index: -1;
 }
 #history #tbl1 {
     margin: auto;
