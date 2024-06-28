@@ -134,6 +134,14 @@
         function hmcdKeydown(e) {
             if (e.key === "Enter" && this.value !== "") {
 
+                // 担当者コードの入力チェック
+                const inputEmpno = document.getElementById("input-empno");
+                if (inputEmpno.value == "" || inputEmpno.value == null) {
+                    alert("担当者コードを先に入力してください．");
+                    inputEmpno.select(); 
+                    return;
+                }
+
                 // 終了処理で入力ボックスがクリアされる前に変数に格納
                 let inputHmcd = document.getElementById("input-hmcd").value;
 
@@ -179,12 +187,26 @@
                     }
 
                     // PDF表示
-                    const subFolder = (pdfcd == "6077") ? "【検証用】炉出口検査PDF" : "【検証用】炉投入荷姿PDF";
-                    const pdfPath = `/static/pdfs/${subFolder}/`;
-                    const pdfName = aryfn[0];
-                    const pdfPara = "#view=FitV&toolbar=0&zoom=FitV";
-                    output.innerHTML = `<iframe src='${pdfPath}${pdfName}${pdfPara}' width='100%' height='100%' frameborder='0' 
-                    style='border:none;'></iframe>${play}${next}`;
+                    if (pdfcd == "6077") {
+                        const subFolder = "【検証用】炉出口検査PDF";
+                        const pdfPath = `/static/pdfs/${subFolder}/`;
+                        const pdfName = aryfn[0];
+                        const pdfPara = "#view=FitV&toolbar=0&zoom=FitV";
+                        output.innerHTML = `<iframe src='${pdfPath}${pdfName}${pdfPara}' width='100%' height='100%' frameborder='0' 
+                        style='border:none;'></iframe>${play}${next}`;
+
+                    // JPEG表示
+                    } else if (pdfcd == "6078") {
+                        const subFolder = "【検証用】炉投入荷姿PDF";
+                        const jpegPath = `/static/jpegs/${subFolder}/`;
+                        const jpegName = aryfn[0].toUpperCase().replace("PDF", "jpeg");
+                        let marginTop = 20;
+                        output.innerHTML = `<img src='${jpegPath}${jpegName}' width='100%' frameborder='0' style='margin-top:${marginTop}px'>${play}${next}`;
+
+                    } else {
+                        alert("プログラム想定異常が発生しました．\nシステム担当者に連絡してください");
+                        return;
+                    }
 
                     // 作業履歴ファイルDB更新
                     if (aryfn.length == 1) {
@@ -276,11 +298,26 @@
                 }
 
                 // PDF表示
-                const subFolder = (pdfcd == "6077") ? "【検証用】炉出口検査PDF" : "【検証用】炉投入荷姿PDF";
-                const pdfPath = `/static/pdfs/${subFolder}/`;
-                const pdfName = fns[pageno - 1];
-                const pdfPara = "#view=FitV&toolbar=0&zoom=FitV";
-                output.innerHTML = `${prev}<iframe src='${pdfPath}${pdfName}${pdfPara}' width='100%' height='100%' frameborder='0' style='border:none;'></iframe>${play}${next}`;
+                if (pdfcd == "6077") {
+                    const subFolder = "【検証用】炉出口検査PDF";
+                    const pdfPath = `/static/pdfs/${subFolder}/`;
+                    const pdfName = fns[pageno - 1];
+                    const pdfPara = "#view=FitV&toolbar=0&zoom=FitV";
+                    output.innerHTML = `${prev}<iframe src='${pdfPath}${pdfName}${pdfPara}' width='100%' height='100%' frameborder='0' 
+                    style='border:none;'></iframe>${play}${next}`;
+
+                // JPEG表示
+                } else if (pdfcd == "6078") {
+                    const subFolder = "【検証用】炉投入荷姿PDF";
+                    const jpegPath = `/static/jpegs/${subFolder}/`;
+                    const jpegName = fns[pageno - 1].toUpperCase().replace("PDF", "jpeg");
+                    let marginTop = 20;
+                    output.innerHTML = `${prev}<img src='${jpegPath}${jpegName}' width='100%' frameborder='0' style='margin-top:${marginTop}px'>${play}${next}`;
+
+                } else {
+                    alert("プログラム想定異常が発生しました．\nシステム担当者に連絡してください");
+                    return;
+                }
 
                 // 検索状態を保持
                 document.getElementById("searchhmcd").value = searchhmcd;
@@ -336,11 +373,26 @@
                 let next = "<a href='javascript:next()'><img class='next' src='/static/images/fa-chevron-circle-right.png'></a>";
                 
                 // PDF表示
-                const subFolder = (pdfcd == "6077") ? "【検証用】炉出口検査PDF" : "【検証用】炉投入荷姿PDF";
-                const pdfPath = `/static/pdfs/${subFolder}/`;
-                const pdfName = fns[pageno - 1];
-                const pdfPara = "#view=FitV&toolbar=0&zoom=FitV";
-                output.innerHTML = `${prev}<iframe src='${pdfPath}${pdfName}${pdfPara}' width='100%' height='100%' frameborder='0' style='border:none;'></iframe>${play}${next}`;
+                if (pdfcd == "6077") {
+                    const subFolder = "【検証用】炉出口検査PDF";
+                    const pdfPath = `/static/pdfs/${subFolder}/`;
+                    const pdfName = fns[pageno - 1];
+                    const pdfPara = "#view=FitV&toolbar=0&zoom=FitV";
+                    output.innerHTML = `${prev}<iframe src='${pdfPath}${pdfName}${pdfPara}' width='100%' height='100%' frameborder='0' 
+                    style='border:none;'></iframe>${play}${next}`;
+
+                // JPEG表示
+                } else if (pdfcd == "6078") {
+                    const subFolder = "【検証用】炉投入荷姿PDF";
+                    const jpegPath = `/static/jpegs/${subFolder}/`;
+                    const jpegName = fns[pageno - 1].toUpperCase().replace("PDF", "jpeg");
+                    let marginTop = 20;
+                    output.innerHTML = `${prev}<img src='${jpegPath}${jpegName}' width='100%' frameborder='0' style='margin-top:${marginTop}px'>${play}${next}`;
+
+                } else {
+                    alert("プログラム想定異常が発生しました．\nシステム担当者に連絡してください");
+                    return;
+                }
 
                 // 検索状態を保持
                 document.getElementById("searchhmcd").value = searchhmcd;
@@ -413,6 +465,7 @@
 //            location.href = `/history/${pdfcd}`;
             window.open(`/history/${pdfcd}`);
         }
+        
     </script>
 
 </body>
