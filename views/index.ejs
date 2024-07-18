@@ -125,9 +125,9 @@
         // キーボード入力小文字から大文字変換
         function inputChange(){
             const inputHMCD = document.getElementById("input-hmcd"); 
-            const HMCD = inputHMCD.value.toUpperCase();
-            // alert(HMCD);
-            inputHMCD.value = inputHMCD.value.toUpperCase();
+            const HMCD = inputHMCD.value.toUpperCase().replace("%", "");
+            //alert(inputHMCD.value + " -> " + HMCD);
+            inputHMCD.value = HMCD;
         }
 
         // 手順書の表示（品番入力のコールバック関数）
@@ -200,8 +200,7 @@
                         const subFolder = "【検証用】炉投入荷姿PDF";
                         const jpegPath = `/static/jpegs/${subFolder}/`;
                         const jpegName = aryfn[0].toUpperCase().replace("PDF", "jpeg");
-                        let marginTop = 20;
-                        output.innerHTML = `<img src='${jpegPath}${jpegName}' width='100%' frameborder='0' style='margin-top:${marginTop}px'>${play}${next}`;
+                        output.innerHTML = `<img src='${jpegPath}${jpegName}' width='99%' frameborder='0' style='margin:auto'>>${play}${next}`;
 
                     } else {
                         alert("プログラム想定異常が発生しました．\nシステム担当者に連絡してください");

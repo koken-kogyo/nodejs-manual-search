@@ -147,6 +147,7 @@ input[type='text']:focus {
 #output {
     width: 100%;
     height: 100%;
+    display: flex;
 }
 #details ul {
     display: inline-block;

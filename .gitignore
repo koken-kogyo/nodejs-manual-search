@@ -24,6 +24,10 @@ pdfs/
 # JPEGS
 jpegs/
 
+# pythonPopplerLibrary
+pythonPopplerLibrary/
+pythonPopplerShare/
+
 # sample sources
 sample/
 
