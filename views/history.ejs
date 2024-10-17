@@ -6,6 +6,10 @@
     <title>履歴表示</title>
     <link rel="stylesheet" href="/static/css/style-basic.css">
     <link rel="stylesheet" href="/static/css/style-index.css">
+    <link rel="stylesheet" href="/static/css/flatpickr.min.css">
+    <script src="/static/javascripts/flatpickr.min.js"></script>
+    <script src="/static/javascripts/ja.js"></script>
+    <script src="/static/javascripts/bootstrap.bundle.min.js"></script>
 </head>
 <body>
     <!-- Header -->
@@ -16,15 +20,29 @@
 
         <div id="history-navi-items">
 
-            <div class="large">検索期間指定:</div>
-            <div class="button-title">History Today</div>
-            <button id="history-today" class="switch checked">当日履歴</button>
-
-            <div class="button-title">History Month</div>
-            <button id="history-month" class="switch">過去１か月履歴</button>
-
-            <div>　</div>
             <div class="large">絞り込み条件:</div>
+
+            <div class="normal">期間で絞り込み [ Extrac Date ]</div>
+            <select id="select-date" name="select-date" title="期間の選択" class="select">
+                <option value="0">当日の履歴を表示</option>
+                <option value="1">日付を指定</option>
+                <option value="2">日付範囲を指定</option>
+                <option value="3">過去一か月間を取得</option>
+                <option value="9">全ての期間で</option>
+            </select>
+            <div class="search-input">
+                <input type="text" id="flatpickr"><button id="flatpickrBtn" onclick="javascript:getHistory();">検索</button>
+                <input type="text" id="flatpickrRange"><button id="flatpickrRangeBtn" onclick="javascript:getHistory();">検索</button>
+            </div>
+            <br><br>
+
+            <div class="normal">入力場所で絞り込み [ Extrac Entry Place ]</div>
+            <select id="select-entry" name="select-entry" title="入力場所の選択" class="select">
+                <option value="">全てを対象</option -->
+                <option value="6077">炉出口</option -->
+                <option value="6078">炉投入</option -->
+        </select>
+
             <div class="normal">社員番号で絞り込み [ Extrac Employee No ]</div>
             <select id="select-empno" name="select-empno" title="担当者の選択" class="select">
             </select>
@@ -32,20 +50,19 @@
             <div class="normal">品番で絞り込み [ Extrac Product Code ]</div>
             <select id="select-hmcd" name="select-hmcd" title="品番の選択" class="select">
                 <option value="">全ての品番</option>
-                <option value="T1855-70743">T1855-70743</option>
             </select>
 
         </div>
 
         <div id="history-navi-button">
+            <div class="button-title">CSV Download</div>
+            <a href="javascript:void(0)" class="refbutton" onclick="downloadCSV()" id="output_btn">
+                CSV出力
+            </a>
             <div class="button-title">Window Close</div>
-            <a href="javascript:window.close()">
-                <button class="button">閉じる</button>
-            </a>
-            <div class="button-title">Finish</div>
-            <a href="javascript:Finish()">
-                <button class="button">作業終了</button>
-            </a>
+            <a href="javascript:window.close()"><button class="button">
+                閉じる
+            </button></a>
     </div>
     </div>
 
@@ -55,30 +72,29 @@
         <table id="tbl1">
             <tr>
                 <th width="40px" rowspan="2">No</th>
+                <th width="80px" rowspan="2">場所</th>
                 <th width="200px" rowspan="2">品番</th>
                 <th width="80px" rowspan="2">日付</th>
                 <th width="200px" colspan="2">時刻</th>
                 <th width="100px" rowspan="2">作業時間</th>
+                <th width="80px" rowspan="2">手順書</th>
                 <th width="200px" rowspan="2">作業者</th>
             </tr>
             <tr>
                 <th width="100px">開始</th>
                 <th width="100px">終了</th>
             </tr>
-            <tr>
+            <!-- tr>
                 <td>1</td>
+                <td>炉出口</td>
                 <td>T1855-70743</td>
+                <td>9/24</td>
                 <td>11:53</td>
                 <td>12:08</td>
                 <td>10分</td>
-            </tr>
-            <tr>
-                <td>2</td>
-                <td>T1855-70743</td>
-                <td>11:53</td>
-                <td>12:08</td>
-                <td>10分</td>
-            </tr>
+                <td>V4</td>
+                <td>担当者名</td>
+            </tr -->
         </table>
         <br><br>
     </div>
@@ -92,24 +108,59 @@
     <script type="text/javascript">
 
         // オブジェクト変数設定
-        const oHistoryToday = document.getElementById("history-today");
-        const oHistoryMonth = document.getElementById("history-month");
+        const oSelectDate = document.getElementById("select-date");
+        const oSelectEntry = document.getElementById("select-entry");
         const oSelectEmpno = document.getElementById("select-empno");
         const oSelectHmcd = document.getElementById("select-hmcd");
+        const tbl1 = document.getElementById("tbl1");
         
-        // 当日履歴クリック イベントリスナー設定
-        oHistoryToday.onclick = event => {
-            oHistoryToday.className = "switch checked";
-            oHistoryMonth.className = "switch";
+        // 日付選択ダイアログ初期化
+        flatpickr("#flatpickr", {locale: "ja"});
+        flatpickr("#flatpickrRange", {locale: "ja", mode: "range"});
+        const oFlatpickr = document.getElementById("flatpickr");
+        const oFlatpickrBtn = document.getElementById("flatpickrBtn");
+        const oFlatpickrRnge = document.getElementById("flatpickrRange");
+        const oFlatpickrRngeBtn = document.getElementById("flatpickrRangeBtn");
+        oFlatpickr.style.display = "none";
+        oFlatpickrBtn.style.display = "none";
+        oFlatpickrRnge.style.display = "none";
+        oFlatpickrRngeBtn.style.display = "none";
+
+        // 初期表示
+        window.onload = function() {            
+            makeSelectEmpno();
+            makeSelectHMCD();
             getHistory();
         }
 
-        // 過去１か月履歴クリック イベントリスナー設定
-        oHistoryMonth.onclick = event => {
-            oHistoryToday.className = "switch";
-            oHistoryMonth.className = "switch checked";
-            getHistory();
+        // 期間指定 selector の change イベントリスナー設定
+        oSelectDate.onchange = event => { 
+            if (oSelectDate.value == "1") {
+                // 日付指定入力ボックスを表示
+                oFlatpickr.style.display = "block";
+                oFlatpickrBtn.style.display = "block";
+                oFlatpickrRnge.style.display = "none";
+                oFlatpickrRngeBtn.style.display = "none";
+                oSelectDate.className = "select selected";
+            } else if (oSelectDate.value == "2") {
+                oFlatpickr.style.display = "none";
+                oFlatpickrBtn.style.display = "none";
+                // 日付範囲指定入力ボックスを表示
+                oFlatpickrRnge.style.display = "block";
+                oFlatpickrRngeBtn.style.display = "block";
+                oSelectDate.className = "select selected";
+            } else {
+                oFlatpickr.style.display = "none";
+                oFlatpickrBtn.style.display = "none";
+                oFlatpickrRnge.style.display = "none";
+                oFlatpickrRngeBtn.style.display = "none";
+                oSelectDate.className = "select";
+                if (oSelectDate.value != "9") getHistory();
+            }
         }
+
+        // 入力場所 selector の change イベントリスナー設定
+        oSelectEntry.onchange = event => { getHistory(); }
 
         // 社員番号 selector の change イベントリスナー設定
         oSelectEmpno.onchange = event => { getHistory(); }
@@ -125,32 +176,52 @@
 
         // 電子マニュアル表示履歴ファイル検索表示処理
         function getHistory() {
-            const pdfcd = document.getElementById("pdfcd").value;
-            const flg = (oHistoryToday.className == "switch checked") ? "T" : "M";
+            const dateflg = oSelectDate.value;
+            const pdfcd = oSelectEntry.value;
             const empno = oSelectEmpno.value;
             const hmcd = oSelectHmcd.value;
-            fetch(`/get/kd8230/${pdfcd}:${flg}:${empno}:${hmcd}:`)
+            let datevalue = "";
+            if (dateflg == "1") {
+                datevalue = oFlatpickr.value;
+            } else if (dateflg == "2") {
+                datevalue = oFlatpickrRnge.value;
+            } else {
+                datevalue = "*";
+            }
+            fetch(`/getapi/kd8230/${dateflg}:${datevalue}:${pdfcd}:${empno}:${hmcd}:`)
             .then(response => response.json())
             .then(data => {
+                // タイトル行に件数を表示
+                document.getElementById("titlepage").innerText = `${data.length} 件`;
                 // 今表示されているテーブルのヘッダー以外を全削除
-                let table = document.getElementById("tbl1");
                 let i = 1;
                 do {
-                    if (table.rows.length > 2) {table.deleteRow(-1);}
-                } while (table.rows.length > 2);
+                    if (tbl1.rows.length > 2) {tbl1.deleteRow(-1);}
+                } while (tbl1.rows.length > 2);
+                // 当日履歴も1か月履歴もJavascriptで逆順にする  if (flg == "M") { data.reverse(); }
+                data.reverse();
                 // APIで取得したデータをテーブ行に追加
-                if (flg == "M") { data.reverse(); }
                 data.some(function (d) {
-                    let newRow = table.insertRow();
+                    let newRow = tbl1.insertRow();
                     appendTD(newRow, i, "");
+                    if (d.PDFCD == "6077") {
+                        appendTD(newRow, "炉出口", "");
+                    } else if (d.PDFCD == "6078") {
+                        appendTD(newRow, "炉投入", "");
+                    }
                     appendTD(newRow, d.HMCD, "");
                     appendTD(newRow, d.WKSTDT2, "");
                     appendTD(newRow, d.WKSTTM2, "");
                     appendTD(newRow, d.WKEDTM2, "");
-                    appendTD(newRow, (d.WKTIME=="-") ?"-" : d.WKTIME + "分", "");
+                    if (d.WKSEC==0) {
+                        appendTD(newRow, (d.WKTIME=="-") ?"-" : "(" + d.WKTIME + "分)", "");
+                    } else {
+                        appendTD(newRow, d.WKSECSTR);
+                    }
+                    appendTD(newRow, d.VERSION2);
                     appendTD(newRow, d.OPNAME, "");
                     i++;
-                    if ( flg == "M" && i > 300 ) {
+                    if ( dateflg != "0" && i > 300 ) {
                         alert("検索結果が300件を超えました！\n条件の絞り込みをして下さい．");
                         return true;
                     }
@@ -165,42 +236,49 @@
         }
 
         // CSVダウンロード処理
-        function csvdownload(){
-            const planday = document.getElementById("planday").value;
-            const odcd = document.querySelector('[name="select-odcd"]').value;
-            const date = new Date();                        //現在時刻を取得
-            const y = date.getFullYear(),                   //西暦年
-                m = ("0" + (date.getMonth() + 1)).slice(-2),//月　
-                d = ("0" + date.getDate()).slice(-2),       //日
-                H = ("0" + date.getHours()).slice(-2),      //時
-                M = ("0" + date.getMinutes()).slice(-2),    //分
-                S = ("0" + date.getSeconds()).slice(-2);    //秒
-            const time = `${H}${M}`;
-            /* alert(`${y}/${m}/${d} ${H}:${M}:${S}`); */
-            // (1) XMLHttpRequestオブジェクトを作成
-            const xmlHttpRequest = new XMLHttpRequest();
-            // (2) CSVデータ作成依頼
-            xmlHttpRequest.open('GET', `/es/makecsv/${planday}/${odcd}/${time}`, false); // 第3引数false:同期通信
-            xmlHttpRequest.send();
-            // (3) 同期処理終了後、ステータス判定
-            if (xmlHttpRequest.readyState == 4 && xmlHttpRequest.status == 200 ) {
-                // (4) CSVダウンロード済みにDOM更新 (1.img画像と2.リンク先)
-                const row = tbl1.rows.length;
-                for( var i = 2; i < row; i++ ){
-                    tbl1.rows[i].cells[13].innerHTML = "済";
-                }
-                const csvimg = document.getElementById("csvimg");
-                csvimg.src = "/static/images/csvnothing.png";
-                const csvref = document.getElementById("csvref");
-                csvref.href = "javascript:void(0)";
-                // (5) 完成したCSVファイルをダウンロード
-                location.href = `/static/downloads/es_${planday}_${odcd}_${time}.csv`;
-            }
-        }
+        function downloadCSV() {
 
+            if (tbl1.rows.length <= 2) {
+                alert("データが存在しません．");
+                return;
+            }
+
+            //ダウンロードするCSVファイル名を指定する
+            const filename = "手順書履歴.csv";
+
+            //CSVデータの作成
+            const csv = [];
+            const row = [];
+            const escaped = /,|\r?\n|\r|"/;
+            const e = /"/g;
+            //BOMを付与する（Excelでの文字化け対策）
+            const bom = new Uint8Array([0xEF, 0xBB, 0xBF])
+      
+            const header = "No,場所,品番,日付,時刻,作業時間,手順書,フラグ,作業者";
+            csv.push(header);
+            for (let r = 2; r < tbl1.rows.length; r++){
+                row.length = 0;
+                for (let c = 0; c < tbl1.rows[r].cells.length; c++) {
+                    const field = tbl1.rows[r].cells[c].textContent;
+                    //row.push(escaped.test(field) ? '"' + field.replace(e, '""') + '"' : field);
+                    row.push(escaped.test(field) ? '"' + field + '"' : '"' + field + '"');
+                }
+                csv.push(row.join(','))
+            }
+            //Blobでデータを作成する
+            const blob = new Blob([bom, csv.join('\n')], { type: "text/csv" });
+
+            const a = document.getElementById('output_btn');
+
+            a.download = filename;
+
+            a.href = window.URL.createObjectURL(blob);
+
+        }
+        
         // 絞り込み社員番号セレクトボックスの作成
         function makeSelectEmpno() {
-            fetch("/get/selectemp")
+            fetch("/getapi/selectemp")
             .then(response => response.json())
             .then(data => {
                 const oSelectEMPNO = document.getElementById("select-empno");
@@ -217,7 +295,7 @@
 
         // 絞り込み品番セレクトボックスの作成
         function makeSelectHMCD() {
-            fetch("/get/selecthmcd")
+            fetch("/getapi/selecthmcd")
             .then(response => response.json())
             .then(data => {
                 const oSelectHMCD = document.getElementById("select-hmcd");
@@ -232,12 +310,6 @@
             });
         }
 
-        // 初期表示
-        window.onload = function() {            
-            makeSelectEmpno();
-            makeSelectHMCD();
-            getHistory();
-        }
     </script>
 
 </body>

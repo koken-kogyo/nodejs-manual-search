@@ -33,58 +33,82 @@ exports.getKM0010 = async (empno) => {
 };
 
 // 目視検査履歴ファイル登録
-exports.insertKD8230 = async (pdfcd, empno, hmcd) => {
+exports.insertKD8230 = async (pdfcd, empno, hmcd, version) => {
     const insert = await getDatabase(
-        "insert into kd8230 (PDFCD, EMPNO, HMCD, WKSTDT) " + 
-        "select ?, ?, ?, now()", [ pdfcd, empno, hmcd ]
+        "insert into kd8230 (PDFCD, EMPNO, HMCD, VERSION, WKSTDT) " + 
+        "select ?, ?, ?, ?, now()", [ pdfcd, empno, hmcd, version ]
     );
 };
 
 // 目視検査履歴ファイル更新（作業終了）
-exports.updateKD8230 = async (pdfcd, empno, hmcd) => {
+exports.updateKD8230 = async (pdfcd, empno, hmcd, wksec) => {
+    // 同一テーブルのサブクエリUpdateがOracleのようにいかない！
+    // select文でラップしてaliasを付ける！
     const update = await getDatabase(
-        "update kd8230 set WKEDDT=now() where PDFCD=? and EMPNO=? and HMCD=? and WKEDDT is null"
-        , [ pdfcd, empno, hmcd ]
+        "update kd8230 set WKEDDT=now(), WKSEC=? where AUTONO=(" + 
+            "select AUTONO from ( " + 
+                "select AUTONO from kd8230 where PDFCD=? and EMPNO=? and HMCD=? " + 
+                "and WKEDDT is null order by AUTONO desc limit 1 " + 
+            ") updateInFromClauseError" + 
+        ")", [ wksec, pdfcd, empno, hmcd ]
     );
 };
 
 // 電子マニュアル表示履歴ファイルデータ取得API
 exports.getKD8230 = async (args) => {
-    const pdfcd = args.split(":")[0];
-    const flg = args.split(":")[1];
-    const tancd = args.split(":")[2];
-    const hmcd = args.split(":")[3];
+    const dateflg = args.split(":")[0];
+    const datevalue = args.split(":")[1];
+    const pdfcd = args.split(":")[2];
+    const tancd = args.split(":")[3];
+    const hmcd = args.split(":")[4];
     let param1 = "";
-    if (flg == "T") {   // Today
-        param1 = "and WKSTDT between curdate() and date_add(curdate(),interval 1 day) ";
-        param1 = "and WKSTDT between date_add(curdate(),interval -1 day) and date_add(curdate(),interval 1 day) ";
-    } else {            // Month
+    // 日付条件指定
+    if (dateflg == "0") {        // Today
+        //Debug param1 = "and WKSTDT between date_add(curdate(),interval -1 day) and date_add(curdate(),interval 1 day) ";
+        param1 = "and WKSTDT between curdate() and date_add(curdate(), interval 1 day) ";
+    } else if (dateflg == "1") { // 日付指定
+        param1 = `and WKSTDT between '${datevalue}' and date_add('${datevalue}', interval 1 day) `;
+    } else if (dateflg == "2") { // 期間指定
+        const dtF = datevalue.substring(0, 10);
+        const dtT = datevalue.slice(-10);
+        param1 = `and WKSTDT between '${dtF}' and date_add('${dtT}', interval 1 day) `;
+    } else if (dateflg == "3") { // 過去一か月間
         param1 = "and WKSTDT between date_add(curdate(),interval -1 month) and date_add(curdate(),interval 1 day) ";
+    } else {
+        param1 = "";
     }
+    // 入力場所指定
     let param2 = "";
-    if (tancd != "" && tancd != null) {
-        param2 = "and a.EMPNO='" + tancd + "' ";
+    if (pdfcd != "" && pdfcd != null) {
+        param2 = "and a.PDFCD='" + pdfcd + "' ";
     }
+    // 担当者条件指定
     let param3 = "";
-    if (hmcd != "" && hmcd != null) {
-        param3 = "and a.HMCD='" + hmcd + "' ";
+    if (tancd != "" && tancd != null) {
+        param3 = "and a.EMPNO='" + tancd + "' ";
     }
-    const kd8230 = await getDatabase(
+    // 品番条件指定
+    let param4 = "";
+    if (hmcd != "" && hmcd != null) {
+        param4 = "and a.HMCD='" + hmcd + "' ";
+    }
+    const sql = 
         "select a.*, ifnull(NAME, '-') as OPNAME, " + 
         "date_format(WKSTDT, '%m/%d') as WKSTDT2, " + 
         "date_format(WKSTDT, '%H:%i') as WKSTTM2, " + 
         "ifnull(date_format(WKEDDT, '%H:%i'), '-') as WKEDTM2, " + 
         "ifnull( (date_format(TIMEDIFF(wkeddt,wkstdt), '%H')+0)*60+" + 
-                "(date_format(TIMEDIFF(wkeddt,wkstdt), '%i')+0), '-') as WKTIME " + 
-        "from kd8230 a left outer join km0010 c on a.EMPNO=c.EMPNO " +
-        "where a.PDFCD=? " + 
+                "(date_format(TIMEDIFF(wkeddt,wkstdt), '%i')+0), '-') as WKTIME, " + 
+        "if(WKSEC>60, concat(truncate(WKSEC/60,0),'分'), concat(WKSEC,'秒')) as WKSECSTR, " + 
+        "ifnull(VERSION, '-') as VERSION2 " + 
+        "from kd8230 a left outer join km0010 c on a.EMPNO=c.EMPNO " + 
+        "where a.autono = a.autono " + 
         param1 + 
         param2 + 
         param3 + 
-        "order by a.AUTONO asc"
-        , [pdfcd]
-    );
-    return kd8230;
+        param4 + 
+        "order by a.WKSTDT asc";
+    return await getDatabase(sql);
 };
 
 // 社員氏名の取得

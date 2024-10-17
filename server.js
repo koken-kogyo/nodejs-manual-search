@@ -73,7 +73,7 @@ app.get("/search/km0010/:empno", async (req, res) => {
 });
 
 // 電子マニュアル表示履歴ファイル取得 API
-app.get("/get/kd8230/:args", async (req, res, next) => {
+app.get("/getapi/kd8230/:args", async (req, res, next) => {
     try {
         const kd8230 = await mysqlHandler.getKD8230(req.params.args);
         res.status(200).json(kd8230);
@@ -83,7 +83,7 @@ app.get("/get/kd8230/:args", async (req, res, next) => {
 });
 
 // 絞り込み用社員の取得 API
-app.get("/get/selectemp", async (req, res, next) => {
+app.get("/getapi/selectemp", async (req, res, next) => {
     try {
         const results = await mysqlHandler.getSelectEmployee();
         res.status(200).json(results);
@@ -93,7 +93,7 @@ app.get("/get/selectemp", async (req, res, next) => {
 });
 
 // 絞り込み用品番の取得 API
-app.get("/get/selecthmcd", async (req, res, next) => {
+app.get("/getapi/selecthmcd", async (req, res, next) => {
     try {
         const results = await mysqlHandler.getSelectHMCD();
         res.status(200).json(results);
@@ -103,13 +103,14 @@ app.get("/get/selecthmcd", async (req, res, next) => {
 });
 
 // 電子マニュアル表示履歴ファイル登録 API
-app.get("/insert/:pdfcd/:empno/:hmcd", async (req, res) => {
+app.get("/insert/:pdfcd/:empno/:hmcd/:version", async (req, res) => {
     const pdfcd = req.params.pdfcd;
     const empno = req.params.empno;
     const hmcd = req.params.hmcd;
+    const version = req.params.version;
     try {
         // console.log(pdfcd + ":" + empno + ":" + hmcd);
-        await mysqlHandler.insertKD8230(pdfcd, empno, hmcd);
+        await mysqlHandler.insertKD8230(pdfcd, empno, hmcd, version);
         res.status(200).end();
     } catch (err) {
         res.status(299).end();
@@ -117,13 +118,14 @@ app.get("/insert/:pdfcd/:empno/:hmcd", async (req, res) => {
 });
 
 // 目視検査履歴ファイル更新（作業終了） API
-app.get("/update/:pdfcd/:empno/:hmcd", async (req, res) => {
+app.get("/finish/:pdfcd/:empno/:hmcd/:wksec", async (req, res) => {
     const pdfcd = req.params.pdfcd;
     const empno = req.params.empno;
     const hmcd = req.params.hmcd;
+    const wksec = req.params.wksec;
     try {
         // console.log(pdfcd + ":" + empno + ":" + hmcd);
-        await mysqlHandler.updateKD8230(pdfcd, empno, hmcd);
+        await mysqlHandler.updateKD8230(pdfcd, empno, hmcd, wksec);
         res.status(200).end();
     } catch (err) {
         res.status(299).end();

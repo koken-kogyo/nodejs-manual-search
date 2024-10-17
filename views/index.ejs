@@ -24,8 +24,6 @@
                 <div class="input"><input type="text" placeholder="担当者コード" id="input-empno"></div>
             </div>
             <div class="navi-item">
-                <div class="large">作業者名:</div>
-                <div class="normal">Worker</div>
                 <label id="worker">Worker</label>
             </div>
             <div class="navi-item">
@@ -47,11 +45,12 @@
                 </a>
             </div>
             <div class="navi-button">
-                <div class="button-title">Finish</div>
-                <a href="javascript:Finish()">
-                    <button class="button">作業終了</button>
-                </a>
+                <div id="pause-restarat-title" class="button-title">Work Time</div>
+                <button id="pause-restarat-button" class="button" onclick="PauseRestarat()">作業時間</button>
            </div>
+           <div id="exit-button">
+                <button onclick="ManualExit()">本日の作業終了</button>
+            </div>
             <input type="hidden" name="pdfcd" id="pdfcd" value="<%= req.params.pdfcd %>">
             <input type="hidden" name="searchhmcd" id="searchhmcd" value="">
             <input type="hidden" name="pageno" id="pageno" value="">
@@ -169,12 +168,17 @@
 
                     // ファイル名から品番を抽出
                     const hmcd = aryfn[0].split("_")[2].toUpperCase().replace(".PDF", "");
+                    const ctrlno = aryfn[0].split("_")[0];
+                    const version = ctrlno.substring(ctrlno.lastIndexOf("V"));
 
                     // 1件Hitの場合、入力品番を上書きする
                     if (aryfn.length == 1) {
                         titlepage.innerText = "作業中";
                         document.getElementById("input-hmcd").value = hmcd;
                         inputHmcd = hmcd;
+
+                        // カウントアップタイマー起動
+                        startInterval();
                     }
                     
                     // 複数Hitした場合、作業開始ボタン、ページ切替ボタンを表示
@@ -209,10 +213,10 @@
 
                     // 作業履歴ファイルDB更新
                     if (aryfn.length == 1) {
-                        xmlHttpRequest.open('GET', `/insert/${pdfcd}/${empno}/${hmcd}`, false);
+                        xmlHttpRequest.open('GET', `/insert/${pdfcd}/${empno}/${hmcd}/${version}`, false);
                         xmlHttpRequest.send();
                         if (xmlHttpRequest.readyState == 4 && xmlHttpRequest.status == 299 ) {
-                            alert(pfdcd + ":" + empno + ":" + hmcd + ":");
+                            alert(pfdcd + ":" + empno + ":" + hmcd + ":" + version + ":");
                             alert("目視検査履歴ファイルの登録に失敗しました\n\nシステム担当者に連絡した上で\n作業は継続してください．");
                         }
                     }
@@ -225,14 +229,25 @@
                     const subFolder = (pdfcd == "6077") ? "【検証用】炉出口検査PDF" : "【検証用】炉投入荷姿PDF";
                     title.innerText = `手順書 ${subFolder}`;
                     titlepage.innerText = "";
+                    // タイトル文字列更新
                     document.querySelector("#menutitle").style.left = "calc((100vw / 2) - 3em)"
                     document.getElementById("input-hmcd").value = inputHmcd;
+                    // カウントアップタイマー起動
+                    startInterval();
+                    
+                    // 手順書PDFなしでも登録 24.09.24
+                    xmlHttpRequest.open('GET', `/insert/${pdfcd}/${empno}/${inputHmcd}/-`, false);
+                    xmlHttpRequest.send();
+                    if (xmlHttpRequest.readyState == 4 && xmlHttpRequest.status == 299 ) {
+                        alert(pfdcd + ":" + empno + ":" + inputHmcd + ":");
+                        alert("目視検査履歴ファイルの登録に失敗しました\n\nシステム担当者に連絡した上で\n作業は継続してください．");
+                    }
                     // PDF表示
                     const pdfPath = "/static/pdfs/";
                     const pdfName = "Nothing.pdf";
                     output.innerHTML = `<iframe src='${pdfPath}${pdfName}#view=FitV&toolbar=0&zoom=FitV' width='100%' height='100%' frameborder='0' style='border:none;'></iframe>`;
                     // 検索状態を保持
-                    document.getElementById("searchhmcd").value = "";
+                    document.getElementById("searchhmcd").value = inputHmcd;
                     document.getElementById("converthmcd").value = "";
                     document.getElementById("pageno").value = "";
                 }
@@ -240,6 +255,55 @@
             }
         }
 
+        let interval_id = null;
+        let tick = 0;
+        // カウントアップタイマー表示
+        function startInterval() {
+            interval_id = setInterval(() => {
+                let h = 0;
+                let m = 0;
+                let s = 0;
+                if (tick>3600)  h = Math.trunc(tick / 3600);
+                if (tick>60)    m = Math.trunc((tick-(3600*h)) / 60);
+                                s = tick - (3600*h) - (60*m);
+                const result = getTick();
+                document.getElementById("pause-restarat-button").innerHTML = 
+                    `<font color="RED"><strong>作業中</strong></font><br>${result}`;
+                tick++;
+            }, 1000);
+        }
+        // 経過時間を日本語文字列で返却
+        function getTick() {
+            let h = 0;
+            let m = 0;
+            let s = 0;
+            if (tick>3600)  h = Math.trunc(tick / 3600);
+            if (tick>60)    m = Math.trunc((tick-(3600*h)) / 60);
+                            s = tick - (3600*h) - (60*m);
+            return (h==0?"":h+"時間") + (m==0?"":m+"分") + s + "秒";
+        }
+        function endInterval() {
+            clearInterval(interval_id);
+            interval_id = null;
+            tick = 0;
+        }
+        function PauseRestarat() {
+            if (interval_id) {
+                const result = getTick();
+                document.getElementById("pause-restarat-button").innerHTML = 
+                    `<font color="RED"><strong>作業中断中</strong></font><br>${result}`;
+                // タイマーイベント停止
+                clearInterval(interval_id);
+                interval_id = null;
+            } else if (tick != 0) {
+                const result = getTick();
+                document.getElementById("pause-restarat-button").innerHTML = 
+                    `<font color="RED"><strong>作業再開</strong></font><br>${result}`;
+                // タイマーイベント再開
+                startInterval();
+                document.getElementById("input-hmcd").select();
+            }
+        }
         // 作業開始
         function play() {
             const pdfcd = document.getElementById("pdfcd").value;
@@ -418,6 +482,9 @@
             const empno = ("00000" + document.getElementById("input-empno").value).slice(-5);
             const searchhmcd = document.getElementById("searchhmcd").value;
             const hmcd = document.getElementById("input-hmcd").value;
+            const wksec = tick;
+            // タイマー解除
+            endInterval();
             if (searchhmcd == "" || searchhmcd == null) { location.href = "/"; } // TopPageに戻る
             /*
             if (searchhmcd != document.getElementById("input-hmcd").value) {
@@ -429,7 +496,7 @@
             // (1) XMLHttpRequestオブジェクトを作成
             const xmlHttpRequest = new XMLHttpRequest();
             // (2) 作業履歴ファイルDB更新
-            xmlHttpRequest.open('GET', `/update/${pdfcd}/${empno}/${searchhmcd}`, false);
+            xmlHttpRequest.open('GET', `/finish/${pdfcd}/${empno}/${searchhmcd}/${wksec}`, false);
             xmlHttpRequest.send();
             // (3) 同期処理終了後、ステータス判定
             if (xmlHttpRequest.readyState == 4 && xmlHttpRequest.status == 299 ) {
@@ -460,9 +527,15 @@
 
         // 履歴表示
         function ViewHistory() {
+            document.getElementById("input-hmcd").select();
             const pdfcd = document.getElementById("pdfcd").value;
-//            location.href = `/history/${pdfcd}`;
             window.open(`/history/${pdfcd}`);
+        }
+        
+        // 本日の作業終了
+        function ManualExit() {
+            Finish();
+            location.href = "/";
         }
         
     </script>

@@ -1,6 +1,6 @@
 @charset "UTF-8";
 /* =========================================================================== */
-/*  es-style.css : 主にMPページ群で使用する基本的なスタイルシート
+/*  style-index.css スタイルシート
 /* =========================================================================== */
 #containers {
     padding-top: 40px;
@@ -14,9 +14,7 @@
 /* 画面の比率が A3比率 [√2:1] 以下の 縦長画面の場合は上下にナビゲーションを配置 */
 @media screen and (max-aspect-ratio: 1414/1000) {
     #containers {
-        grid-template-columns: 1fr;
-        grid-template-rows: 50px auto;
-        background: rgb(25, 25, 25);
+        grid-template-columns: 240px auto;
     }
 }
 /* desktop-pc-size: 1300px～ */
@@ -34,18 +32,19 @@
     padding-top: 20px;
     padding-bottom: 20px;
     grid-template-columns: 1fr;
-    grid-template-rows: 7rem 8rem 7rem 1fr;
+    grid-template-rows: 7rem 5rem 7rem 1fr;
     background: rgb(248, 248, 248);
     font-size: 1.0em; /* ベースフォントサイズ */
 }
-/* 画面の比率が A3比率 [√2:1] 以下の 縦長画面の場合は上下にナビゲーションを配置 */
+/* 画面の比率が A3比率 [√2:1] 以下の 縦長画面の場合は上下にナビゲーションを配置
 @media screen and (max-aspect-ratio: 1414/1000) {
     #navigate {
         grid-template-columns: repeat(3, 1fr);
-        grid-template-rows: 1fr; /* subgrid; */ 
+        grid-template-rows: 1fr; 
         background: rgb(25, 25, 25);
     }
 }
+*/
 .large {
     font-size: 1.5em;
     margin-left: 0.8em;
@@ -82,10 +81,9 @@ input[type='text']:focus {
 }
 .button {
     margin-left: 1em;
-    margin-bottom: 1em;
+    margin-bottom: 0.5em;
     width: calc(100% - 2em);
     padding-top: 0.3em;
-    padding-inline: 1.5em;
     border: 1.5px solid #2589d0;
     border-radius: 5px;
     background-color: #fff;
@@ -94,6 +92,16 @@ input[type='text']:focus {
 }
 .button:hover {
     background-color: #2589d0;
+    color: #fff;
+    cursor: pointer;
+}
+#exit-button {
+    margin: auto;
+}
+#exit-button button:hover {
+    background-color: #2589d0;
+    border: 2.0px solid #168de1;
+    border-radius: 3px;
     color: #fff;
     cursor: pointer;
 }
@@ -242,6 +250,39 @@ input[type='text']:focus {
     left: 330px;
     border-radius: 5px;
     background: rgb(248, 248, 248, 0.8);
+}
+#history-navi-items .selected {
+    background-color: #2589d0;
+    color: #fff;
+}
+#history-navi-items .search-input {
+    display: inline-flex;
+}
+#history-navi-items input[type='text'] {
+    font-size: 0.9em;
+    margin-inline: 1.8em;
+    padding: 0.3em;
+    border: 1px solid rgba(82, 223, 0, 0.936);
+    width: 13em;
+}
+.refbutton {
+    display: block;
+    text-align: center;
+    text-decoration: none;
+    font-size: 1.2em;
+    margin-left: 1.5em;
+    margin-bottom: 1em;
+    width: calc(100% - 3.7em);
+    padding: 0.3em;
+    border: 1.5px solid #2589d0;
+    border-radius: 5px;
+    background-color: #fff;
+    color: #2589d0;
+}
+.refbutton:hover {
+    background-color: #2589d0;
+    color: #fff;
+    cursor: pointer;
 }
 #history #tbl1 {
     margin: auto;
