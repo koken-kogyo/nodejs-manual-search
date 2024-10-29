@@ -45,8 +45,10 @@ app.get('/history/:pdfcd', (req, res) => {
 });
 
 // PDFファイル検索 API
-app.get("/search/filename/:pdfcd/:hmcd", async function (req, res) {
-    const folder = getFolderName(req.params.pdfcd);
+app.get("/search/filename/:pdfcd/:empno/:hmcd", async function (req, res) {
+    const pdfcd = req.params.pdfcd;
+    const empno = req.params.empno;
+    const folder = getFolderName(pdfcd);
     const hmcd = req.params.hmcd;
 
     // スキャンした入力品番が品目マスタに存在するかチェック（スキャナの調子が悪いため）
@@ -54,6 +56,7 @@ app.get("/search/filename/:pdfcd/:hmcd", async function (req, res) {
     if (result == false && hmcd.length > 7) {
         const logger = log4js.getLogger("e");
         logger.error(`品目マスタに存在しません:[${hmcd}]`);
+        logger.error(`/search/filename/${pdfcd}/${empno}/${hmcd}`);
         res.status(404).end();  // 7桁以上の入力 && 品目マスタに存在しない場合
     } else {
         // 入力品番から検索結果のファイル名一覧を取得

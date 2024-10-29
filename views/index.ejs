@@ -111,7 +111,7 @@
                         document.querySelector("#worker").style.fontSize = "1.5em";
                     }
                     document.getElementById("worker").innerText = name;
-                    document.getElementById("input-hmcd").select();
+                    inputHmcdObj.select();
                 } else {
                     document.getElementById("worker").innerText = "担当者が見つかりません";
                     document.querySelector("#worker").style.fontSize = "1.1em";
@@ -123,10 +123,9 @@
 
         // キーボード入力小文字から大文字変換
         function inputChange(){
-            const inputHmcdObj = document.getElementById("input-hmcd"); 
-            const HMCD = inputHmcdObj.value.toUpperCase().replace("%", "");
-            //alert(inputHmcdObj.value + " -> " + HMCD);
-            inputHmcdObj.value = HMCD;
+            const HMCD = document.getElementById("input-hmcd").value.toUpperCase().replace("%", "");
+            //alert(document.getElementById("input-hmcd").value + " -> " + HMCD);
+            document.getElementById("input-hmcd").value = HMCD;
         }
 
         // 手順書の表示（品番入力のコールバック関数）
@@ -161,7 +160,7 @@
             const empno = ("00000" + document.getElementById("input-empno").value).slice(-5);
 
             const xmlHttpRequest = new XMLHttpRequest();
-            xmlHttpRequest.open('GET', `/search/filename/${pdfcd}/${inputHmcd}`, false);
+            xmlHttpRequest.open('GET', `/search/filename/${pdfcd}/${empno}/${inputHmcd}`, false);
             xmlHttpRequest.send();
             if (xmlHttpRequest.readyState == 4 && xmlHttpRequest.status == 200 ) {
                 const aryfn = JSON.parse(xmlHttpRequest.responseText);
@@ -310,13 +309,14 @@
                 // タイマーイベント停止
                 clearInterval(interval_id);
                 interval_id = null;
+                inputHmcdObj.select();
             } else if (tick != 0) {
                 const result = getTick();
                 document.getElementById("pause-restarat-button").innerHTML = 
                     `<font color="RED"><strong>作業再開</strong></font><br>${result}`;
                 // タイマーイベント再開
                 startInterval();
-                document.getElementById("input-hmcd").select();
+                inputHmcdObj.select();
             }
         }
         // 作業開始
@@ -345,7 +345,7 @@
             const output = document.getElementById("output");
                 
             const xmlHttpRequest = new XMLHttpRequest();
-            xmlHttpRequest.open('GET', `/search/filename/${pdfcd}/${searchhmcd}`, false);
+            xmlHttpRequest.open('GET', `/search/filename/${pdfcd}//${searchhmcd}`, false);
             xmlHttpRequest.send();
             if (xmlHttpRequest.readyState == 4 && xmlHttpRequest.status == 200 ) {
                 const fns = JSON.parse(xmlHttpRequest.responseText);
@@ -407,7 +407,7 @@
                 document.getElementById("converthmcd").value = "";
                 document.getElementById("pageno").value = "";
             }
-            document.getElementById("input-hmcd").select();
+            inputHmcdObj.select();
         }
 
         // 前ページ
@@ -420,7 +420,7 @@
             const output = document.getElementById("output");
                 
             const xmlHttpRequest = new XMLHttpRequest();
-            xmlHttpRequest.open('GET', `/search/filename/${pdfcd}/${searchhmcd}`, false);
+            xmlHttpRequest.open('GET', `/search/filename/${pdfcd}//${searchhmcd}`, false);
             xmlHttpRequest.send();
             if (xmlHttpRequest.readyState == 4 && xmlHttpRequest.status == 200 ) {
                 const fns = JSON.parse(xmlHttpRequest.responseText);
@@ -481,7 +481,7 @@
                 document.getElementById("converthmcd").value = "";
                 document.getElementById("pageno").value = "";
             }
-            document.getElementById("input-hmcd").select();
+            inputHmcdObj.select();
         }
 
         // 作業終了
@@ -522,7 +522,7 @@
             const pdfPath = "/static/pdfs/";
             const pdfName = "Initialize.pdf";
             output.innerHTML = `<iframe src='${pdfPath}${pdfName}#view=FitV&toolbar=0&zoom=FitV' width='100%' height='100%' frameborder='0' style='border:none;'></iframe>`;
-            document.getElementById("input-hmcd").select();
+            inputHmcdObj.select();
         }
 
         // 作業者変更
@@ -535,7 +535,7 @@
 
         // 履歴表示
         function ViewHistory() {
-            document.getElementById("input-hmcd").select();
+            inputHmcdObj.select();
             const pdfcd = document.getElementById("pdfcd").value;
             window.open(`/history/${pdfcd}`);
         }
