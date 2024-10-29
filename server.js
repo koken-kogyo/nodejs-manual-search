@@ -18,6 +18,10 @@ const { PORT, log4jsConfig } = require("./config.js");
 const { getFolderName } = require("./handlers/server.js");
 const mysqlHandler = require("./handlers/mysql.js");
 
+// log4jsロガー設定
+const log4js = require("log4js");
+log4js.configure(log4jsConfig);
+
 // テンプレートエンジンの設定
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
@@ -41,19 +45,27 @@ app.get('/history/:pdfcd', (req, res) => {
 });
 
 // PDFファイル検索 API
-app.get("/search/filename/:pdfcd/:hmcd", (req, res) => {
+app.get("/search/filename/:pdfcd/:hmcd", async function (req, res) {
     const folder = getFolderName(req.params.pdfcd);
     const hmcd = req.params.hmcd;
-    const files = fs.readdirSync(`./public/pdfs/${folder}`);
 
-    // 入力品番から検索結果のファイル名一覧を取得
-    const results = files.filter(fn => fn.indexOf(hmcd)!==-1);
-
-    // const fn = files[no];
-    if ( results.length == 0 ) {
-        res.status(299).end();
+    // スキャンした入力品番が品目マスタに存在するかチェック（スキャナの調子が悪いため）
+    const result = await mysqlHandler.isM0500(hmcd);
+    if (result == false && hmcd.length > 7) {
+        const logger = log4js.getLogger("e");
+        logger.error(`品目マスタに存在しません:[${hmcd}]`);
+        res.status(404).end();  // 7桁以上の入力 && 品目マスタに存在しない場合
     } else {
-        res.status(200).end(JSON.stringify(results));
+        // 入力品番から検索結果のファイル名一覧を取得
+        const files = fs.readdirSync(`./public/pdfs/${folder}`);
+        const results = files.filter(fn => fn.indexOf(hmcd)!==-1);
+
+        // フォルダ内検索結果を判定
+        if ( results.length == 0 ) {
+            res.status(299).end(); // 手順書なし
+        } else {
+            res.status(200).end(JSON.stringify(results));
+        }
     }
 });
 

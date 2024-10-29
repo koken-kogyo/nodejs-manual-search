@@ -122,3 +122,9 @@ exports.getSelectHMCD = async () => {
     const sql = "select distinct HMCD from kd8230 order by HMCD"
     return getDatabase(sql, "");
 };
+
+// 品目マスタ(M0500)存在チェック
+exports.isM0500 = async (hmcd) => {
+    const m0500 = await getDatabase("select HMCD from m0500 where HMCD=?", [hmcd]);
+    return m0500.length == 0 ? false : true;
+};
