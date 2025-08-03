@@ -1,0 +1,43 @@
+〇環境構築方法
+
+
+概要
+	PDFを画像変換し必要な部分を切り出す
+
+
+詳細
+	１．PDFを画像変換する [ pdf2image ] パッケージ（※留意点参照）
+	２．画像処理で線の外周を検出 [ opencv-python ] パッケージ
+	３．外周の上から２番目の水平線を切り出す範囲に再設定
+	４．切り出して保存
+
+
+
+準備１ python実行環境の構築
+	インストーラーのダウンロードと実行
+		python-3.13.5-amd64.exe
+
+	パッケージ管理 [pip] の動作確認
+		pip --version
+		動作しない場合 → pathを通す
+			C:\Users\nabe\AppData\Local\Programs\Python\Python313\Scripts
+
+	[py] の動作確認
+			C:\Users\nabe\AppData\Local\Programs\Python\Launcher
+
+
+準備２ パッケージのインストール
+	pip install pdf2image
+
+	pip install opencv-python
+		=> Successfully installed numpy-2.2.6 opencv-python-4.12.0.88
+
+留意点
+	[pdf2image] は内部的にPopplerをラッピングしたモジュールとなる為
+	Popplerを別途GitHubからzipファイルをダウンロードする必要がある。
+
+	ダウンロード → 解凍 → 適切なフォルダに移動 →
+	OS にて PATH を通す
+		"C:\Koken\POPPLER\poppler-24.08.0\Library\bin"
+	もしくはソースコードにて PATH を追加
+		poppler_dir = Path(__file__).parent.absolute() / "pythonPopplerLibrary/bin"
