@@ -11,6 +11,10 @@
     <link rel="stylesheet" href="/static/css/style-index.css">
 </head>
 <body>
+    <!-- Common JavaScript EJS -->
+    <%- include("_myfunctions.ejs") %>
+    <% let osType = myRequestHeader.osType(req); %>
+
     <!-- Header -->
     <%- include("_header.ejs", { req, title: title }) %>
 
@@ -30,6 +34,15 @@
                 <div class="large">製品バーコード：</div>
                 <div class="normal">Product code (Barcode)</div>
                 <input type="text" placeholder="品番をスキャン" id="input-hmcd">
+            </div>
+            <div class="navi-item">
+                <!-- 全画面表示切り替えチェックボックス -->
+                <!-- OSがWindows,Android(linux)の場合 -->
+                <% if (osType == "windows" || osType == "linux") { %>
+                <label class="check-disp">
+                    <input type="checkbox" id="checkDisp" onchange="checkDispChange()">&nbsp;全画面表示
+                </label>
+                <% }; %>
             </div>
             <div></div>
             <div class="navi-button">
@@ -103,6 +116,22 @@
                 searchHMCD();
             }
         }
+
+        // 全画面表示切り替えチェックボックス
+        function checkDispChange() {
+            const checkDispObj = document.getElementById("checkDisp");
+            const output = document.getElementById('output');
+            const img = output.querySelector('img'); // iframe内の画像を取得
+            if (checkDispObj.checked) {
+                document.documentElement.requestFullscreen();
+                img.style.transform = 'scale(1.1)';
+            } else {
+                document.exitFullscreen();
+                img.style.transform = 'scale(1.0)';
+            }
+            inputHmcdObj.select(); // フォーカスセット
+        }
+
     </script>
     <script type="text/javascript" src="/static/javascripts/index.js"></script>
 

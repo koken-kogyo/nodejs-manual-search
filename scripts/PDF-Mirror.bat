@@ -10,9 +10,9 @@ set source1=\\filesv\iso\H’ö•Êè‡‘A’ •[Œ´†AH’ö•\\»‘¢‚Q‰Û\yŒŸØ—pz˜FoŒ
 set source2=\\filesv\iso\H’ö•Êè‡‘A’ •[Œ´†AH’ö•\\»‘¢‚Q‰Û\yŒŸØ—pz˜F“Š“ü‰×pPDF
 
 rem ƒ~ƒ‰[ƒŠƒ“ƒOƒtƒHƒ‹ƒ_İ’è
-set dest1=D:\Node.js\nodejs-manual-search\public\pdfs\yŒŸØ—pz˜FoŒûŒŸ¸PDF
-set dest2=D:\Node.js\nodejs-manual-search\public\pdfs\yŒŸØ—pz˜F“Š“ü‰×pPDF
-set dest3=D:\Node.js\nodejs-manual-search\public\jpegs\yŒŸØ—pz˜F“Š“ü‰×pPDF
+set dest1=D:\Node.js\nodejs-20-manual-search\public\pdfs\yŒŸØ—pz˜FoŒûŒŸ¸PDF
+set dest2=D:\Node.js\nodejs-20-manual-search\public\pdfs\yŒŸØ—pz˜F“Š“ü‰×pPDF
+set dest3=D:\Node.js\nodejs-20-manual-search\public\jpegs\yŒŸØ—pz˜F“Š“ü‰×pPDF
 
 rem ƒ~ƒ‰[ƒŠƒ“ƒO
 echo yŒŸØ—pz˜FoŒûŒŸ¸PDF

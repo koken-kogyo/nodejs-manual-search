@@ -93,11 +93,17 @@ def process(path):
         # 4. 切り出しと保存
         # 切り出したBGRをRBGに変換して日本語を含むJPEGファイル名として上書き保存
 
+        # 外周輪郭アスペクト比が1.45未満の場合は1.45になるような追加の余白を設定
+        aspectpad = 0
+        if float(w / h) < 1.45:
+            print(f"{w} / {h} = {float(w / h)}")
+            aspectpad = int(((h * 1.45) - w) / 2)
+
         # 切り出す領域に少し余白を追加
         padding = 2
-        x_pad = max(0, x - padding)
+        x_pad = max(0, x - padding - aspectpad)
         y_pad = crop_top_y - padding
-        w_pad = min(img_bgr.shape[1] - x_pad, w + 2 * padding)
+        w_pad = min(img_bgr.shape[1] - x_pad, w + 2 * (padding + aspectpad))
         h_pad = min(img_bgr.shape[0] - y_pad, h - (crop_top_y - y) + 2 * padding)
 
         # 切り出し

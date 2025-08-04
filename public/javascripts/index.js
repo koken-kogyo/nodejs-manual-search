@@ -62,6 +62,7 @@
             const title = document.getElementById("menutitle");
             const titlepage = document.getElementById("titlepage");
             const output = document.getElementById("output");
+            const checkDispObj = document.getElementById("checkDisp");
             const pdfcd = document.getElementById("pdfcd").value;
             const empno = ("00000" + document.getElementById("input-empno").value).slice(-5);
 
@@ -113,8 +114,11 @@
                     const subFolder = "【検証用】炉投入荷姿PDF";
                     const jpegPath = `/static/jpegs/${subFolder}/`;
                     const jpegName = aryfn[0].toUpperCase().replace("PDF", "jpeg");
-                    output.innerHTML = `<img src='${jpegPath}${jpegName}' width='99%' frameborder='0' style='margin:auto'>>${play}${next}`;
-
+                    if (checkDispObj.checked) {
+                        output.innerHTML = `<img src='${jpegPath}${jpegName}' width='99%' frameborder='0' style='margin:auto'>>${play}${next}`;
+                    } else {
+                        output.innerHTML = `<img src='${jpegPath}${jpegName}' width='90%' frameborder='0' style='margin:auto'>>${play}${next}`;
+                    }
                 } else {
                     alert("プログラム想定異常が発生しました．\nシステム担当者に連絡してください");
                     return;
@@ -249,7 +253,8 @@
             const title = document.getElementById("menutitle");
             const titlepage = document.getElementById("titlepage");
             const output = document.getElementById("output");
-                
+            const checkDispObj = document.getElementById("checkDisp");
+            
             const xmlHttpRequest = new XMLHttpRequest();
             xmlHttpRequest.open('GET', `/search/filename/${pdfcd}//${searchhmcd}`, false);
             xmlHttpRequest.send();
@@ -289,7 +294,11 @@
                     const jpegPath = `/static/jpegs/${subFolder}/`;
                     const jpegName = fns[pageno - 1].toUpperCase().replace("PDF", "jpeg");
                     let marginTop = 20;
-                    output.innerHTML = `${prev}<img src='${jpegPath}${jpegName}' width='100%' frameborder='0' style='margin-top:${marginTop}px'>${play}${next}`;
+                    if (checkDispObj.checked) {
+                        output.innerHTML = `${prev}<img src='${jpegPath}${jpegName}' width='99%' frameborder='0' style='margin-top:${marginTop}px'>${play}${next}`;
+                    } else {
+                        output.innerHTML = `${prev}<img src='${jpegPath}${jpegName}' width='90%' frameborder='0' style='margin-top:${marginTop}px'>${play}${next}`;
+                    }
 
                 } else {
                     alert("プログラム想定異常が発生しました．\nシステム担当者に連絡してください");
@@ -324,7 +333,8 @@
             const title = document.getElementById("menutitle");
             const titlepage = document.getElementById("titlepage");
             const output = document.getElementById("output");
-                
+            const checkDispObj = document.getElementById("checkDisp");
+            
             const xmlHttpRequest = new XMLHttpRequest();
             xmlHttpRequest.open('GET', `/search/filename/${pdfcd}//${searchhmcd}`, false);
             xmlHttpRequest.send();
@@ -364,7 +374,11 @@
                     const jpegPath = `/static/jpegs/${subFolder}/`;
                     const jpegName = fns[pageno - 1].toUpperCase().replace("PDF", "jpeg");
                     let marginTop = 20;
-                    output.innerHTML = `${prev}<img src='${jpegPath}${jpegName}' width='100%' frameborder='0' style='margin-top:${marginTop}px'>${play}${next}`;
+                    if (checkDispObj.checked) {
+                        output.innerHTML = `${prev}<img src='${jpegPath}${jpegName}' width='99%' frameborder='0' style='margin-top:${marginTop}px'>${play}${next}`;
+                    } else {
+                        output.innerHTML = `${prev}<img src='${jpegPath}${jpegName}' width='90%' frameborder='0' style='margin-top:${marginTop}px'>${play}${next}`;
+                    }
 
                 } else {
                     alert("プログラム想定異常が発生しました．\nシステム担当者に連絡してください");

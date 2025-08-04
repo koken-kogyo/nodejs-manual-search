@@ -17,27 +17,21 @@
 	インストーラーのダウンロードと実行
 		python-3.13.5-amd64.exe
 
-	パッケージ管理 [pip] の動作確認
-		pip --version
-		動作しない場合 → pathを通す
-			C:\Users\nabe\AppData\Local\Programs\Python\Python313\Scripts
-
 	[py] の動作確認
-			C:\Users\nabe\AppData\Local\Programs\Python\Launcher
+		動作しない場合 → pathを通す
+			C:\Users\<ログインユーザー>\AppData\Local\Programs\Python\Launcher
 
-
-準備２ パッケージのインストール
-	pip install pdf2image
-
-	pip install opencv-python
+準備２ PDF画像変換に必要なパッケージのインストール
+	py -m pip install pdf2image
+	py -m pip install opencv-python
 		=> Successfully installed numpy-2.2.6 opencv-python-4.12.0.88
 
 留意点
-	[pdf2image] は内部的にPopplerをラッピングしたモジュールとなる為
-	Popplerを別途GitHubからzipファイルをダウンロードする必要がある。
+	[pdf2image] は内部的にPoppler(ポップラー)をラッピングしたモジュールとなる為
+	Poppler(ポップラー)を別途GitHubからzipファイルダウンロードする必要がある。
 
 	ダウンロード → 解凍 → 適切なフォルダに移動 →
 	OS にて PATH を通す
 		"C:\Koken\POPPLER\poppler-24.08.0\Library\bin"
-	もしくはソースコードにて PATH を追加
+	もしくはソースコード内にて PATH を追加
 		poppler_dir = Path(__file__).parent.absolute() / "pythonPopplerLibrary/bin"

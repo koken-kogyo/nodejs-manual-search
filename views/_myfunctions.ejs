@@ -1,0 +1,40 @@
+
+<%
+// ejs内で使用する共通関数群
+myFunc = {
+    // a: 日付形式の文字列を [m/d] で返却
+    a: function(value){
+        let dateObject = new Date(value);
+        return (dateObject.getMonth() + 1) + "/" + dateObject.getDate();
+    },
+    // b: 日付形式の文字列を [yyyy-mm-dd] で返却
+    b: function(value){
+        let dateObject = new Date(value);
+        return dateObject.getFullYear() + "-" + ("0" + (dateObject.getMonth() + 1)).slice(-2) + "-" + ("0" + dateObject.getDate()).slice(-2);
+    },
+    // c: 日付形式の文字列を [ [ m月d日] ] で返却
+    c: function(value){
+        let dateObject = new Date(value);
+        return " [ " + (dateObject.getMonth() + 1) + "月" + dateObject.getDate() + "日 ]";
+    },
+}
+myRequestHeader = {
+    osType: function(req){
+        const userAgent = req.headers["user-agent"].toString().toLowerCase();
+        if (userAgent.match("windows") !== null) { return "windows"; } else 
+        if (userAgent.match("linux") !== null) { return "linux"; } else 
+        if (userAgent.match("ipad") !== null) { return "ipad"; } else 
+        if (userAgent.match("iphone") !== null) { return "iphone"; } else { return ""; }
+        // 以下取得した userAgent 一覧
+        // Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36 Edg/114.0.1823.67"
+        // Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36
+        // Mozilla/5.0 (iPad; CPU OS 15_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.4 Mobile/15E148 Safari/604.1"
+        // Mozilla/5.0 (iPhone; CPU iPhone OS 16_3_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.3 Mobile/15E148 Safari/604.1"
+    }
+}
+mySample = {
+    // https://qiita.com/qwe001/items/1f0f7282729e62388bf1
+    test: function(){ return "hello"; },
+    hoge: function(str){ return str; }
+  }
+%>
