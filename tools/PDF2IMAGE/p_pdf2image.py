@@ -96,7 +96,7 @@ def process(path):
         # 外周輪郭アスペクト比が1.45未満の場合は1.45になるような追加の余白を設定
         aspectpad = 0
         if float(w / h) < 1.45:
-            print(f"{w} / {h} = {float(w / h)}")
+            print(f"{w} / {h} = {round(float(w / h),3)} 切り出し後 => {int(h * 1.45) + 4} / {h - (crop_top_y - y) + 4} = {round(float((int(h * 1.45) + 4) / (h - (crop_top_y - y) + 4)),3)}")
             aspectpad = int(((h * 1.45) - w) / 2)
 
         # 切り出す領域に少し余白を追加
@@ -148,22 +148,39 @@ def recursive_file_check(path):
                 if source_mtime > destination_mtime:
                     process(path)
 
-                # Debug用 全てのファイルを対象に検証したい場合に使用する
-                #else:
-                    #process(path)
+                # Debug用 全てのファイルを対象に検証したい場合、以下のコメントを外して実行する
+                # else:
+                    # process(path)
+
+
+# 2つのフォルダを比較し、拡張子を除いたファイル名で比較した上で、片方にしか存在しないファイルを削除する
+# (バージョンが古いファイルが残ってしまうので削除)
+def compare_and_delete(source_folder, target_folder):
+    # 拡張子を除いたファイル名を取得
+    source_files = {os.path.splitext(file)[0]: file for file in os.listdir(source_folder)}
+    target_files = {os.path.splitext(file)[0]: file for file in os.listdir(target_folder)}
+
+    # target_folderにのみ存在するファイルを削除
+    for file_name in target_files.keys() - source_files.keys():
+        file_path = os.path.join(target_folder, target_files[file_name])
+        os.remove(file_path)
+        print(f"Deleted from target: {file_path}")
+
 
 
 # メイン処理
 if __name__ == "__main__":
 
     if len(sys.argv) == 3:
+        compare_and_delete(sys.argv[1], sys.argv[2])
         recursive_file_check(sys.argv[1])
         exit(0)
     else:
-        # Debug用 ソースコードから実行したい場合に使用する
+        # Debug用 ソースコードから実行したい場合、以下のコメントを外して実行する
         # PDF_ROOT_PATH  = 'D:/Node.js/nodejs-20-manual-search/public/pdfs/【検証用】炉投入荷姿PDF'
         # JPEG_ROOT_PATH = 'D:/Node.js/nodejs-20-manual-search/public/jpegs/【検証用】炉投入荷姿PDF'
         # sys.argv = ["p_pdf2image.py", f"{PDF_ROOT_PATH}", f"{JPEG_ROOT_PATH}"]
+        # compare_and_delete(sys.argv[1], sys.argv[2])
         # recursive_file_check(sys.argv[1])
         print("引数にターゲットフォルダと、変換フォルダを指定してください．")
         exit(1)
