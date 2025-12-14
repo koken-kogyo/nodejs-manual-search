@@ -97,7 +97,7 @@ app.get("/getapi/kd8230/:args", async (req, res, next) => {
     }
 });
 
-// 絞り込み用社員の取得 API
+// 絞り込み用社員の取得 API 2025.12.14 廃止
 app.get("/getapi/selectemp", async (req, res, next) => {
     try {
         const results = await mysqlHandler.getSelectEmployee();
@@ -107,7 +107,7 @@ app.get("/getapi/selectemp", async (req, res, next) => {
     }
 });
 
-// 絞り込み用品番の取得 API
+// 絞り込み用品番の取得 API 2025.12.14 廃止
 app.get("/getapi/selecthmcd", async (req, res, next) => {
     try {
         const results = await mysqlHandler.getSelectHMCD();

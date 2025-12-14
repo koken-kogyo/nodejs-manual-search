@@ -5,6 +5,8 @@ const getFolderName = (pdfcd) => {
         folder = "【検証用】炉出口検査PDF";
     } else if (pdfcd == "6078") {
         folder = "【検証用】炉投入荷姿PDF";
+    } else if (pdfcd == "6111") {
+        folder = "物流梱包PDF";
     } else {
         folder = "【検証用】炉出口検査PDF";
     }

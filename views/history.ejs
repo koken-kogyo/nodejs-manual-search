@@ -41,6 +41,7 @@
                 <option value="">全てを対象</option -->
                 <option value="6077">炉出口</option -->
                 <option value="6078">炉投入</option -->
+                <option value="6111">梱包</option -->
         </select>
 
             <div class="normal">社員番号で絞り込み [ Extrac Employee No ]</div>
@@ -127,9 +128,7 @@
         oFlatpickrRngeBtn.style.display = "none";
 
         // 初期表示
-        window.onload = function() {            
-            makeSelectEmpno();
-            makeSelectHMCD();
+        window.onload = function() {
             getHistory();
         }
 
@@ -198,6 +197,13 @@
                 do {
                     if (tbl1.rows.length > 2) {tbl1.deleteRow(-1);}
                 } while (tbl1.rows.length > 2);
+
+                // 取得したデータから社員番号でグルーピングしてセレクトボックスを作成
+                makeSelectEmpno(data, empno);
+
+                // 取得したデータから品番でグルーピングしてセレクトボックスを作成
+                makeSelectHMCD(data, hmcd);
+
                 // 当日履歴も1か月履歴もJavascriptで逆順にする  if (flg == "M") { data.reverse(); }
                 data.reverse();
                 // APIで取得したデータをテーブ行に追加
@@ -208,6 +214,8 @@
                         appendTD(newRow, "炉出口", "");
                     } else if (d.PDFCD == "6078") {
                         appendTD(newRow, "炉投入", "");
+                    } else if (d.PDFCD == "6111") {
+                        appendTD(newRow, "梱包", "");
                     }
                     appendTD(newRow, d.HMCD, "");
                     appendTD(newRow, d.WKSTDT2, "");
@@ -277,38 +285,59 @@
         }
         
         // 絞り込み社員番号セレクトボックスの作成
-        function makeSelectEmpno() {
-            fetch("/getapi/selectemp")
-            .then(response => response.json())
-            .then(data => {
-                const oSelectEMPNO = document.getElementById("select-empno");
-                // 初期値を設定
-                oSelectEMPNO.innerHTML = "<option value=''>全ての社員</option>";
-                data.forEach(function (d) {
-                    let option = document.createElement("option");
-                    option.value = d.EMPNO;
-                    option.innerHTML = d.EMPNO + ":" + d.NAME;
-                    oSelectEMPNO.appendChild(option);
-                });
+        function makeSelectEmpno(data, empno) {
+            const groupedEmpData = empnoGroupBy(data, 'EMPNO');
+            oSelectEmpno.innerHTML = "<option value=''>全ての社員</option>";
+            Object.keys(groupedEmpData).sort().forEach(key => {
+                let option = document.createElement("option");
+                option.value = key.split(":")[0];
+                option.innerHTML = key;
+                if (empno == key.split(":")[0]) option.selected = true;
+                oSelectEmpno.appendChild(option);
             });
+        }
+        function empnoGroupBy(array, key) {
+            if (!Array.isArray(array)) {
+                throw new TypeError('First argument must be an array');
+            }
+            return array.reduce((result, item) => {
+                const groupKey = `${item.EMPNO}:${item.OPNAME}`;
+                if (!groupKey) return result; // キーが存在しない場合はスキップ
+                if (!result[groupKey]) {
+                    result[groupKey] = [];
+                }
+                result[groupKey].push(item);
+                return result;
+            }, {});
         }
 
         // 絞り込み品番セレクトボックスの作成
-        function makeSelectHMCD() {
-            fetch("/getapi/selecthmcd")
-            .then(response => response.json())
-            .then(data => {
-                const oSelectHMCD = document.getElementById("select-hmcd");
-                // 初期値を設定
-                oSelectHMCD.innerHTML = "<option value=''>全ての品番</option>";
-                data.forEach(function (d) {
-                    let option = document.createElement("option");
-                    option.value = d.HMCD;
-                    option.innerHTML = d.HMCD;
-                    oSelectHMCD.appendChild(option);
-                });
+        function makeSelectHMCD(data, hmcd) {
+            const groupedHMCDData = hmcdGroupBy(data, 'HMCD');
+            oSelectHmcd.innerHTML = "<option value=''>全ての品番</option>";
+            Object.keys(groupedHMCDData).sort().forEach(key => {
+                let option = document.createElement("option");
+                option.value = key;
+                option.innerHTML = key;
+                if (hmcd == key) option.selected = true;
+                oSelectHmcd.appendChild(option);
             });
         }
+        function hmcdGroupBy(array, key) {
+            if (!Array.isArray(array)) {
+                throw new TypeError('First argument must be an array');
+            }
+            return array.reduce((result, item) => {
+                const groupKey = item[key];
+                if (!groupKey) return result; // キーが存在しない場合はスキップ
+                if (!result[groupKey]) {
+                    result[groupKey] = [];
+                }
+                result[groupKey].push(item);
+                return result;
+            }, {});
+        }
+
 
     </script>
 

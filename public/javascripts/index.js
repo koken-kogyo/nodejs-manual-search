@@ -109,6 +109,14 @@
                     output.innerHTML = `<iframe src='${pdfPath}${pdfName}${pdfPara}' width='100%' height='100%' frameborder='0' 
                     style='border:none;'></iframe>${play}${next}`;
 
+                } else if (pdfcd == "6111") {
+                    const subFolder = "物流梱包PDF";
+                    const pdfPath = `/static/pdfs/${subFolder}/`;
+                    const pdfName = aryfn[0];
+                    const pdfPara = "#view=FitV&toolbar=0&zoom=FitV";
+                    output.innerHTML = `<iframe src='${pdfPath}${pdfName}${pdfPara}' width='100%' height='100%' frameborder='0' 
+                    style='border:none;'></iframe>${play}${next}`;
+
                 // JPEG表示
                 } else if (pdfcd == "6078") {
                     const subFolder = "【検証用】炉投入荷姿PDF";
@@ -151,7 +159,7 @@
                 document.getElementById("pageno").value = "";
                 inputHmcdObj.select();
             } else {
-                const subFolder = (pdfcd == "6077") ? "【検証用】炉出口検査PDF" : "【検証用】炉投入荷姿PDF";
+                const subFolder = (pdfcd == "6077") ? "【検証用】炉出口検査PDF" : (pdfcd =="6078") ? "【検証用】炉投入荷姿PDF" : "物流梱包PDF";
                 title.innerText = `手順書 ${subFolder}`;
                 titlepage.innerText = "";
                 // タイトル文字列更新
@@ -288,6 +296,14 @@
                     output.innerHTML = `${prev}<iframe src='${pdfPath}${pdfName}${pdfPara}' width='100%' height='100%' frameborder='0' 
                     style='border:none;'></iframe>${play}${next}`;
 
+                } else if (pdfcd == "6111") {
+                    const subFolder = "物流梱包PDF";
+                    const pdfPath = `/static/pdfs/${subFolder}/`;
+                    const pdfName = fns[pageno - 1];
+                    const pdfPara = "#view=FitV&toolbar=0&zoom=FitV";
+                    output.innerHTML = `${prev}<iframe src='${pdfPath}${pdfName}${pdfPara}' width='100%' height='100%' frameborder='0' 
+                    style='border:none;'></iframe>${play}${next}`;
+
                 // JPEG表示
                 } else if (pdfcd == "6078") {
                     const subFolder = "【検証用】炉投入荷姿PDF";
@@ -310,7 +326,7 @@
                 document.getElementById("converthmcd").value = hmcd;
                 document.getElementById("pageno").value = pageno;
             } else {
-                const subFolder = (pdfcd == "6077") ? "【検証用】炉出口検査PDF" : "【検証用】炉投入荷姿PDF";
+                const subFolder = (pdfcd == "6077") ? "【検証用】炉出口検査PDF" : (pdfcd =="6078") ? "【検証用】炉投入荷姿PDF" : "物流梱包PDF";
                 title.innerText = `手順書 ${subFolder}`;
                 titlepage.innerText = "";
                 document.querySelector("#menutitle").style.left = "calc((100vw / 2) - 3em)"
@@ -368,6 +384,14 @@
                     output.innerHTML = `${prev}<iframe src='${pdfPath}${pdfName}${pdfPara}' width='100%' height='100%' frameborder='0' 
                     style='border:none;'></iframe>${play}${next}`;
 
+                } else if (pdfcd == "6111") {
+                    const subFolder = "物流梱包PDF";
+                    const pdfPath = `/static/pdfs/${subFolder}/`;
+                    const pdfName = fns[pageno - 1];
+                    const pdfPara = "#view=FitV&toolbar=0&zoom=FitV";
+                    output.innerHTML = `${prev}<iframe src='${pdfPath}${pdfName}${pdfPara}' width='100%' height='100%' frameborder='0' 
+                    style='border:none;'></iframe>${play}${next}`;
+
                 // JPEG表示
                 } else if (pdfcd == "6078") {
                     const subFolder = "【検証用】炉投入荷姿PDF";
@@ -390,7 +414,7 @@
                 document.getElementById("converthmcd").value = hmcd;
                 document.getElementById("pageno").value = pageno;
             } else {
-                const subFolder = (pdfcd == "6077") ? "【検証用】炉出口検査PDF" : "【検証用】炉投入荷姿PDF";
+                const subFolder = (pdfcd == "6077") ? "【検証用】炉出口検査PDF" : (pdfcd =="6078") ? "【検証用】炉投入荷姿PDF" : "物流梱包PDF";
                 title.innerText = `手順書 ${subFolder}`;
                 document.querySelector("#menutitle").style.left = "calc((100vw / 2) - 3em)"
                 // PDF表示

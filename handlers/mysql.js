@@ -111,13 +111,13 @@ exports.getKD8230 = async (args) => {
     return await getDatabase(sql);
 };
 
-// 社員氏名の取得
+// 社員氏名の取得 2025.12.14 廃止
 exports.getSelectEmployee = async () => {
     const sql = "select distinct a.EMPNO, b.NAME from kd8230 a, km0010 b where a.EMPNO=b.EMPNO order by a.EMPNO"
     return getDatabase(sql, "");
 };
 
-// 社員氏名の取得
+// 品番の取得 2025.12.14 廃止
 exports.getSelectHMCD = async () => {
     const sql = "select distinct HMCD from kd8230 order by HMCD"
     return getDatabase(sql, "");
