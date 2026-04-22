@@ -15,6 +15,7 @@
 
 準備１ python実行環境の構築
 	インストーラーのダウンロードと実行
+		\\2019backup\software\Apps\ 200.XENRM Express + Node.js + React + MySQL\@Pythone_(PDFを画像変換し切り出し)
 		python-3.13.5-amd64.exe
 
 	[py] の動作確認

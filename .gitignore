@@ -2,6 +2,7 @@
 
 # VSCode
 *.code-workspace
+*.WinMerge
 npm*
 
 # config
