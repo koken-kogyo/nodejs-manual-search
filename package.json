@@ -9,10 +9,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "ejs": "^5.0.2",
+    "ejs": "^6.0.1",
     "express": "^5.2.1",
     "log4js": "^6.9.1",
-    "mysql2": "^3.22.2",
+    "mysql2": "^3.23.3",
     "serve-favicon": "^2.5.1"
   }
 }
