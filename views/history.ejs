@@ -41,7 +41,6 @@
                 <option value="">全てを対象</option -->
                 <option value="6077">炉出口</option -->
                 <option value="6078">炉投入</option -->
-                <option value="6111">梱包</option -->
         </select>
 
             <div class="normal">社員番号で絞り込み [ Extrac Employee No ]</div>
@@ -214,8 +213,6 @@
                         appendTD(newRow, "炉出口", "");
                     } else if (d.PDFCD == "6078") {
                         appendTD(newRow, "炉投入", "");
-                    } else if (d.PDFCD == "6111") {
-                        appendTD(newRow, "梱包", "");
                     }
                     appendTD(newRow, d.HMCD, "");
                     appendTD(newRow, d.WKSTDT2, "");
